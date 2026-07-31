@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variable files containing secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+
+# Local databases
+*.sqlite
+*.sqlite3
+**/database.sqlite
+
+# System and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
