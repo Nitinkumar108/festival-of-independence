@@ -5,11 +5,8 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs.jsx";
-import UpcomingEvents from "./pages/UpcomingEvents.jsx";
 import SupportUs from "./pages/SupportUs.jsx";
 import Gallery from "./pages/Gallery.jsx";
-import ContactUs from "./pages/ContactUs.jsx";
-import FAQ from "./pages/FAQ.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
@@ -25,11 +22,11 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/events" element={<UpcomingEvents />} />
+          <Route path="/events" element={<Home />} />
           <Route path="/support-us" element={<SupportUs />} />
           <Route path="/gallery" element={<Gallery />} />
-          <Route path="/contact" element={<ContactUs />} />
-          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Home />} />
+          <Route path="/faq" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
