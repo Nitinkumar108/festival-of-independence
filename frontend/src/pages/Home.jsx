@@ -6,73 +6,73 @@ import { useAuth } from "../context/AuthContext.jsx";
 const testimonials = [
   {
     id: 1,
-    name: "Aarav Sharma",
-    designation: "Student, IIEST Shibpur",
-    image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80",
-    quote: "Attending the Festival of Independence by IYF Kolkata completely changed my perspective on our nation's spiritual heritage. The sessions on leadership and ethics were truly life-changing!"
+    name: "Aritra Hazra",
+    designation: "UEM Kolkata | Manager, TATA Steel",
+    image: "/testimonials/AritraHazra.jpg",
+    quote: "These sessions taught me how to balance high-pressure professional life with inner clarity, focus, and values. It helped me stay anchored, remain calm during challenges, and lead with purpose."
   },
   {
     id: 2,
-    name: "Priya Roy",
-    designation: "Software Engineer, TCS Kolkata",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
-    quote: "An unforgettable blend of culture, patriotic zeal, and practical wisdom. IYF Kolkata empowers today's youth to lead purposeful lives while staying rooted in our rich Indian traditions."
+    name: "Shibam Choudhury",
+    designation: "MBBS, SSKM Hospital",
+    image: "/testimonials/Shibam.jpg",
+    quote: "Alongside my MBBS studies, this journey has helped me develop discipline, focus, and emotional resilience. Far from being a distraction, it has improved my academic performance while giving me greater clarity, confidence, and purpose."
   },
   {
     id: 3,
-    name: "Rahul Banerjee",
-    designation: "Final Year B.Tech, Jadavpur University",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-    quote: "The energy and positivity at the festival were unmatched. The interactive workshops gave me clarity on balancing academic goals with inner peace and values."
+    name: "Sayan Guha",
+    designation: "RG Medtech Pvt. Ltd.",
+    image: "/testimonials/Sayan.jpg",
+    quote: "The lessons taught me discipline, humility and Selfless service. It inspired me to appreciate the importance of creating an ecosystem with the same shared values for everyone to work together with mutual respect and a common purpose to create a lasting change."
   },
   {
     id: 4,
-    name: "Sneha Ganguly",
-    designation: "Research Scholar, Calcutta University",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-    quote: "A brilliant initiative celebrating Bharat Varsha's heritage. The cultural performances and keynote discourses were thought-provoking and deeply inspiring."
+    name: "Samrat Das",
+    designation: "Gold Medalist, IIEST Shibpur | PhD IISc, Bangalore",
+    image: "/testimonials/samrat_pr.jpeg",
+    quote: "Everyone is searching for inner fulfilment of heart, and I truly found the process for continual bliss at IIEST Shibpur. It's a new and fresh like morning dew. Extremely grateful for the association of such helpful seniors for transforming me as a better human being."
   },
   {
     id: 5,
-    name: "Vikramaditya Das",
-    designation: "Data Analyst, Wipro",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
-    quote: "IYF Kolkata provides an incredible platform for youth to connect, learn, and grow. This festival instilled a strong sense of pride, responsibility, and national unity."
+    name: "Subhojit Dhar",
+    designation: "Gold Medalist, IIEST Shibpur | Manager, TATA Steel",
+    image: "/testimonials/subojit-pr.jpeg",
+    quote: "The timeless wisdom taught here helped me build strong character, clarity of purpose, and resilience. It guided me to excel in my academics at IIEST Shibpur and carry those values into my professional life at TATA Steel."
   },
   {
     id: 6,
-    name: "Ananya Sen",
-    designation: "Medical Student, RG Kar Medical College",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80",
-    quote: "The atmosphere was filled with joy, devotion, and patriotic pride. I met so many like-minded students striving for personal excellence and social harmony."
+    name: "Arup Rai",
+    designation: "B.D. Poddar University | Manager, TATA Steel",
+    image: "/testimonials/arup_rai.jpeg",
+    quote: "The teachings of Vedic Scriptures gave me clear purpose and vision. Embracing selflessness, compassion, and equal vision helps me build inclusive, growth-oriented spaces, stay dedicated to excellence, and view failures as valuable lessons."
   },
   {
     id: 7,
-    name: "Rohan Mukhopadhyay",
-    designation: "Mechanical Engg, NIT Durgapur",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80",
-    quote: "From insightful discussions on ancient Indian sciences to vibrant cultural events, every moment of the festival was enriching. Highly recommended for every student!"
+    name: "Adarsh Singh",
+    designation: "IIEST Shibpur | Software Engineer, CIMPRESS",
+    image: "/testimonials/Adarsh.jpg",
+    quote: "These sessions have helped me balance my academic, professional, and personal life while managing stress with a calm and positive mindset."
   },
   {
     id: 8,
-    name: "Ishita Chakrabarti",
-    designation: "Student, St. Xavier's College",
-    image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
-    quote: "The Festival of Independence gave us a fresh lens to look at our roots. The team's hospitality and the speakers' wisdom made it a truly memorable experience."
+    name: "Nitin Kr. Bais",
+    designation: "IIEST Shibpur | IT System Analyst, Bandhan Bank",
+    image: "/testimonials/Nitin.jpg",
+    quote: "Spirituality has given me a balanced and focused life with a clear sense of purpose. It has helped me stay away from negativity, remain calm during challenges, and experience inner peace. I believe it is especially valuable for students in today's fast-paced world."
   },
   {
     id: 9,
-    name: "Devansh Verma",
-    designation: "Entrepreneur & IYF Alumnus",
-    image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=200&q=80",
-    quote: "Participating in IYF events during college laid the foundation for my ethical leadership skills. This festival is a beacon of light for the younger generation."
+    name: "Swamynath Chourasia",
+    designation: "B.Com., Jaipuria College | Accountant",
+    image: "/testimonials/Swamynath.jpg",
+    quote: "These sessions have helped me clearly see my goal in life and strive towards it with purpose and determination. They have strengthened my wisdom and character enabling me to make better decisions, stay focused during challenges, and become a more responsible and noble individual."
   },
   {
     id: 10,
-    name: "Tiyasa Bhowmick",
-    designation: "PG Student, Heritage Institute of Tech",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
-    quote: "A wonderful celebration of our nation's 80th Independence Day! It helped me discover inner strength, focus, and a strong commitment to serving society."
+    name: "Aritra Roy",
+    designation: "Gold Medalist, IIEST Shibpur | Asst. Manager, HINDALCO",
+    image: "/testimonials/Aritra.jpg",
+    quote: "I deeply appreciate the competence and character development taught in these programs. It gave me direction during my college days at IIEST Shibpur and continues to guide my leadership at HINDALCO."
   }
 ];
 

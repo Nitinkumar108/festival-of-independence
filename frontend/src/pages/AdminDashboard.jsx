@@ -58,13 +58,30 @@ export default function AdminDashboard() {
     role: user?.role || "SuperAdmin",
   });
 
+  // Contact Messages Inbox state
+  const [contactMessages, setContactMessages] = useState([]);
+  const [loadingContactMsgs, setLoadingContactMsgs] = useState(false);
+
   useEffect(() => {
     if (activeTab === "students") fetchStudents();
     if (activeTab === "notifications") fetchNotifications();
     if (activeTab === "events") fetchEvents();
     if (activeTab === "colleges") fetchColleges();
     if (activeTab === "team") fetchAdminTeam();
+    if (activeTab === "messages") fetchContactMessages();
   }, [activeTab, paymentStatus]);
+
+  async function fetchContactMessages() {
+    setLoadingContactMsgs(true);
+    try {
+      const res = await api.get("/contact");
+      setContactMessages(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingContactMsgs(false);
+    }
+  }
 
   async function fetchStudents() {
     setLoadingStudents(true);
@@ -355,6 +372,24 @@ export default function AdminDashboard() {
                   }`}
                 >
                   <span className="text-base">📅</span> Manage Events & Programs
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("messages")}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                    activeTab === "messages"
+                      ? "bg-amber-100/70 text-saffron shadow-2xs"
+                      : "text-gray-600 hover:bg-gray-100/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="text-base">📩</span> Contact Inbox
+                  </span>
+                  {contactMessages.length > 0 && (
+                    <span className="text-[10px] font-extrabold bg-saffron text-navy px-2 py-0.5 rounded-full">
+                      {contactMessages.length}
+                    </span>
+                  )}
                 </button>
 
                 <button
@@ -824,7 +859,56 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* TAB 6: ADMIN PROFILE INFO */}
+            {/* TAB 6: CONTACT INBOX MESSAGES */}
+            {activeTab === "messages" && (
+              <div className="space-y-6">
+                <div className="border-b border-gray-100 pb-3 flex justify-between items-center">
+                  <div>
+                    <h2 className="text-xl font-extrabold tracking-tight text-navy">Contact Us Inbox</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Inquiries submitted by website visitors.</p>
+                  </div>
+                  <button
+                    onClick={fetchContactMessages}
+                    className="text-xs font-bold text-navy bg-gray-100 hover:bg-gray-200 px-3.5 py-2 rounded-xl transition-all"
+                  >
+                    🔄 Refresh Inbox
+                  </button>
+                </div>
+
+                {loadingContactMsgs ? (
+                  <p className="text-xs text-gray-500 italic">Loading messages...</p>
+                ) : contactMessages.length === 0 ? (
+                  <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                    <p className="text-sm font-bold text-gray-600">Inbox is empty</p>
+                    <p className="text-xs text-gray-400 mt-1">No contact messages received yet.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3.5 max-h-[500px] overflow-y-auto pr-1">
+                    {contactMessages.map((msg) => (
+                      <div key={msg.id} className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-2xs space-y-2.5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-gray-100 pb-2">
+                          <div>
+                            <h3 className="font-extrabold text-navy text-sm">{msg.name}</h3>
+                            <p className="text-xs text-gray-500">
+                              📧 <a href={`mailto:${msg.email}`} className="text-saffron hover:underline">{msg.email}</a>
+                              {msg.phone && <span className="ml-3">📞 {msg.phone}</span>}
+                            </p>
+                          </div>
+                          <span className="text-[10px] font-semibold text-gray-400">
+                            {new Date(msg.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap bg-gray-50/60 p-3 rounded-xl border border-gray-100">
+                          {msg.message}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 7: ADMIN PROFILE INFO */}
             {activeTab === "profile" && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 space-y-6">
                 <h2 className="text-xl font-extrabold tracking-tight text-navy border-b border-gray-100 pb-3">Admin Account Details</h2>
