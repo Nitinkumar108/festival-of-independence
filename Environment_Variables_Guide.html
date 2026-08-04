@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Environment Variables Setup Guide - Festival of Independence</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f8fafc;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+    h1 {
+      color: #0f172a;
+      border-bottom: 3px solid #f59e0b;
+      padding-bottom: 10px;
+      margin-top: 0;
+      font-size: 24px;
+    }
+    h2 {
+      color: #1e3a8a;
+      margin-top: 25px;
+      font-size: 18px;
+    }
+    pre {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 18px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .print-btn {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      float: right;
+      margin-top: -50px;
+    }
+    .print-btn:hover {
+      background: #d97706;
+      color: white;
+    }
+    @media print {
+      .print-btn { display: none; }
+      body { background: white; margin: 0; padding: 0; }
+      .card { box-shadow: none; border: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <span class="badge">Deployment Guide</span>
+    <h1>Festival of Independence — Deployment Environment Variables</h1>
+    <p>This document contains all required production environment variables for deploying the Backend API and Frontend Web Application.</p>
+
+    <h2>1. Backend Environment Variables (backend/.env)</h2>
+    <p>Set these variables on your backend hosting service (Render / Railway / Fly.io):</p>
+    <pre><code># ===== Server Configuration =====
+PORT=5000
+NODE_ENV=production
+CLIENT_URL=https://your-frontend-app.netlify.app
+
+# ===== Database (PostgreSQL / Supabase Pooler) =====
+DATABASE_URL=postgresql://postgres.vlehmybhsdxwbouphzlo:HareKrishna%4016108@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
+
+# ===== JWT Security =====
+JWT_SECRET=super_secret_festival_key_12345
+JWT_EXPIRES_IN=7d
+
+# ===== Razorpay Payment Gateway =====
+RAZORPAY_KEY_ID=rzp_test_placeholder_id
+RAZORPAY_KEY_SECRET=placeholder_secret
+RAZORPAY_WEBHOOK_SECRET=placeholder_webhook_secret
+REGISTRATION_FEE_INR=500
+
+# ===== Email (SMTP Server / Gmail App Password) =====
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=nitin.231218@gmail.com
+SMTP_PASSWORD=ovmdxpinyznrkbqa
+EMAIL_FROM="Festival of Independence - IYF Kolkata" &lt;nitin.231218@gmail.com&gt;
+
+# ===== Admin Seed Credentials =====
+SEED_ADMIN_NAME=IYF Kolkata Admin
+SEED_ADMIN_EMAIL=nitin.231218@gmail.com
+SEED_ADMIN_PASSWORD=adminpassword123</code></pre>
+
+    <h2>2. Frontend Environment Variables (frontend/.env)</h2>
+    <p>Set this variable on Netlify / Vercel Environment Variables:</p>
+    <pre><code># ===== API Gateway Endpoint =====
+VITE_API_URL=https://your-backend-app.onrender.com/api</code></pre>
+
+    <h2>3. Instructions for Contributor</h2>
+    <ol>
+      <li><strong>Backend Hosting (Render/Railway):</strong> Create a new Node.js web service linked to the <code>backend/</code> folder. Paste all Backend variables into the Environment section. Set start command to <code>node server.js</code>.</li>
+      <li><strong>Frontend Hosting (Netlify/Vercel):</strong> Create a new site linked to the <code>frontend/</code> folder. Set build command to <code>npm run build</code> and publish directory to <code>dist</code>. Add <code>VITE_API_URL</code> to Environment Variables.</li>
+    </ol>
+  </div>
+</body>
+</html>

@@ -2,79 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../context/AuthContext.jsx";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Aritra Hazra",
-    designation: "UEM Kolkata | Manager, TATA Steel",
-    image: "/testimonials/AritraHazra.jpg",
-    quote: "These sessions taught me how to balance high-pressure professional life with inner clarity, focus, and values. It helped me stay anchored, remain calm during challenges, and lead with purpose."
-  },
-  {
-    id: 2,
-    name: "Shibam Choudhury",
-    designation: "MBBS, SSKM Hospital",
-    image: "/testimonials/Shibam.jpg",
-    quote: "Alongside my MBBS studies, this journey has helped me develop discipline, focus, and emotional resilience. Far from being a distraction, it has improved my academic performance while giving me greater clarity, confidence, and purpose."
-  },
-  {
-    id: 3,
-    name: "Sayan Guha",
-    designation: "RG Medtech Pvt. Ltd.",
-    image: "/testimonials/Sayan.jpg",
-    quote: "The lessons taught me discipline, humility and Selfless service. It inspired me to appreciate the importance of creating an ecosystem with the same shared values for everyone to work together with mutual respect and a common purpose to create a lasting change."
-  },
-  {
-    id: 4,
-    name: "Samrat Das",
-    designation: "Gold Medalist, IIEST Shibpur | PhD IISc, Bangalore",
-    image: "/testimonials/samrat_pr.jpeg",
-    quote: "Everyone is searching for inner fulfilment of heart, and I truly found the process for continual bliss at IIEST Shibpur. It's a new and fresh like morning dew. Extremely grateful for the association of such helpful seniors for transforming me as a better human being."
-  },
-  {
-    id: 5,
-    name: "Subhojit Dhar",
-    designation: "Gold Medalist, IIEST Shibpur | Manager, TATA Steel",
-    image: "/testimonials/subojit-pr.jpeg",
-    quote: "The timeless wisdom taught here helped me build strong character, clarity of purpose, and resilience. It guided me to excel in my academics at IIEST Shibpur and carry those values into my professional life at TATA Steel."
-  },
-  {
-    id: 6,
-    name: "Arup Rai",
-    designation: "B.D. Poddar University | Manager, TATA Steel",
-    image: "/testimonials/arup_rai.jpeg",
-    quote: "The teachings of Vedic Scriptures gave me clear purpose and vision. Embracing selflessness, compassion, and equal vision helps me build inclusive, growth-oriented spaces, stay dedicated to excellence, and view failures as valuable lessons."
-  },
-  {
-    id: 7,
-    name: "Adarsh Singh",
-    designation: "IIEST Shibpur | Software Engineer, CIMPRESS",
-    image: "/testimonials/Adarsh.jpg",
-    quote: "These sessions have helped me balance my academic, professional, and personal life while managing stress with a calm and positive mindset."
-  },
-  {
-    id: 8,
-    name: "Nitin Kr. Bais",
-    designation: "IIEST Shibpur | IT System Analyst, Bandhan Bank",
-    image: "/testimonials/Nitin.jpg",
-    quote: "Spirituality has given me a balanced and focused life with a clear sense of purpose. It has helped me stay away from negativity, remain calm during challenges, and experience inner peace. I believe it is especially valuable for students in today's fast-paced world."
-  },
-  {
-    id: 9,
-    name: "Swamynath Chourasia",
-    designation: "B.Com., Jaipuria College | Accountant",
-    image: "/testimonials/Swamynath.jpg",
-    quote: "These sessions have helped me clearly see my goal in life and strive towards it with purpose and determination. They have strengthened my wisdom and character enabling me to make better decisions, stay focused during challenges, and become a more responsible and noble individual."
-  },
-  {
-    id: 10,
-    name: "Aritra Roy",
-    designation: "Gold Medalist, IIEST Shibpur | Asst. Manager, HINDALCO",
-    image: "/testimonials/Aritra.jpg",
-    quote: "I deeply appreciate the competence and character development taught in these programs. It gave me direction during my college days at IIEST Shibpur and continues to guide my leadership at HINDALCO."
-  }
-];
+import TestimonialsSection from "../components/TestimonialsSection.jsx";
+import ContactSection from "../components/ContactSection.jsx";
+import FaqSection from "../components/FaqSection.jsx";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&w=1600&q=80", // Indian Flag flying proudly
@@ -186,29 +116,6 @@ const journeyMilestones = [
   }
 ];
 
-const faqs = [
-  {
-    q: "Who can register for the Festival of Independence programs?",
-    a: "Any student or youth interested in participating is welcome to register through the website.",
-  },
-  {
-    q: "Is there a registration fee?",
-    a: "Yes, a nominal registration fee applies and can be paid securely online after logging in.",
-  },
-  {
-    q: "How do I get my class/program joining link?",
-    a: "Once logged in, your student dashboard shows the upcoming program schedule along with joining links or venue details.",
-  },
-  {
-    q: "Is my payment information secure?",
-    a: "Yes. All payments are processed through Razorpay; we never store your card details on our servers.",
-  },
-  {
-    q: "What is the 1-Year Journey program?",
-    a: "The 1-Year Journey is a 7-milestone leadership & spiritual values program designed by IYF Kolkata to empower Indian youth with character, clarity, competence, and compassion.",
-  }
-];
-
 function AnimatedTimelineItem({ item, isEven }) {
     const [isVisible, setIsVisible] = useState(false);
     const domRef = useRef(null);
@@ -288,10 +195,7 @@ function AnimatedTimelineItem({ item, isEven }) {
 
 export default function Home() {
   const { user, token, role } = useAuth();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [heroIndex, setHeroIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
 
   // UG Notice State (Persisted in localStorage so it never pops up again once closed)
   const [isUgNoticeDismissed, setIsUgNoticeDismissed] = useState(() => {
@@ -303,72 +207,13 @@ export default function Home() {
     setIsUgNoticeDismissed(true);
   }
 
-  // Contact Form State
-  const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [contactStatus, setContactStatus] = useState(null);
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-    }, 5000);
-
     const heroTimer = setInterval(() => {
       setHeroIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
     }, 5000);
 
-    return () => {
-      clearInterval(timer);
-      clearInterval(heroTimer);
-    };
+    return () => clearInterval(heroTimer);
   }, []);
-
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  };
-
-  // Mobile Touch Swipe Handlers
-  const handleTouchStart = (e) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const minSwipeDistance = 50;
-    if (distance > minSwipeDistance) {
-      handleNext();
-    } else if (distance < -minSwipeDistance) {
-      handlePrev();
-    }
-    setTouchStart(0);
-    setTouchEnd(0);
-  };
-
-  function handleContactChange(e) {
-    setContactForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-  }
-
-  async function handleContactSubmit(e) {
-    e.preventDefault();
-    setContactStatus("sending");
-    try {
-      await api.post("/contact", contactForm);
-      setContactStatus("sent");
-      setContactForm({ name: "", email: "", phone: "", message: "" });
-    } catch (err) {
-      setContactStatus("error");
-    }
-  }
 
   return (
     <div className="w-full min-h-screen overflow-x-hidden">
@@ -594,263 +439,13 @@ export default function Home() {
       </section>
 
       {/* 4. Horizontal Testimonials Slider Section */}
-      <section className="bg-cream py-10 sm:py-16 px-4 overflow-hidden">
-        <div className="max-w-3xl mx-auto">
-
-          {/* Section Header */}
-          <div className="text-center mb-6 sm:mb-8">
-            <span className="text-saffron font-bold text-xs sm:text-sm tracking-wider uppercase bg-saffron/10 px-3.5 py-1 rounded-full">
-              Voices of Inspiration
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-navy mt-2.5 px-2">
-              What Youth Say About The Festival
-            </h2>
-            <div className="w-14 sm:w-16 h-1 bg-gradient-to-r from-saffron to-indiagreen mx-auto mt-2.5 rounded-full"></div>
-          </div>
-
-          {/* Slider Container with Touch Support */}
-          <div
-            className="relative"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            <div className="overflow-hidden rounded-2xl shadow-xl bg-white border border-gray-100 p-5 sm:p-8 md:p-10 transition-all duration-500">
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-              >
-                {testimonials.map((item) => (
-                  <div
-                    key={item.id}
-                    className="w-full flex-shrink-0 flex flex-col items-center text-center px-2 sm:px-4"
-                  >
-                    <div className="relative mb-3 sm:mb-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-3 border-saffron shadow-md p-0.5 bg-white ring-2 ring-saffron/20"
-                      />
-                    </div>
-
-                    <svg
-                      className="w-6 h-6 sm:w-8 sm:h-8 text-saffron/30 mb-2"
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                    >
-                      <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-1.1.9-2 2-2h0V8zm14 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-1.1.9-2 2-2h0V8z" />
-                    </svg>
-
-                    <p className="text-gray-700 text-xs sm:text-base md:text-lg italic mb-4 sm:mb-6 max-w-xl leading-relaxed font-medium px-1">
-                      "{item.quote}"
-                    </p>
-
-                    <div className="flex flex-col items-center">
-                      <h4 className="font-bold text-navy text-sm sm:text-lg mb-0.5">{item.name}</h4>
-                      <p className="text-[11px] sm:text-sm text-indiagreen font-semibold">
-                        {item.designation}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop Navigation Arrows */}
-            <button
-              onClick={handlePrev}
-              aria-label="Previous testimonial"
-              className="hidden sm:flex absolute left-2 md:-left-6 top-1/2 -translate-y-1/2 bg-white text-navy p-2.5 sm:p-3 rounded-full shadow-lg hover:bg-saffron hover:text-white transition-all duration-300 border border-gray-100 group"
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button
-              onClick={handleNext}
-              aria-label="Next testimonial"
-              className="hidden sm:flex absolute right-2 md:-right-6 top-1/2 -translate-y-1/2 bg-white text-navy p-2.5 sm:p-3 rounded-full shadow-lg hover:bg-saffron hover:text-white transition-all duration-300 border border-gray-100 group"
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Mobile Navigation Buttons Row */}
-          <div className="flex sm:hidden justify-between items-center px-2 mt-4">
-            <button
-              onClick={handlePrev}
-              className="bg-white text-navy px-3.5 py-1.5 rounded-full shadow-sm border border-gray-200 text-xs font-bold flex items-center gap-1 active:scale-95 active:bg-saffron active:text-white transition-all"
-            >
-              ← Prev
-            </button>
-            <span className="text-[11px] text-gray-500 font-medium tracking-tight">
-              Swipe or tap
-            </span>
-            <button
-              onClick={handleNext}
-              className="bg-white text-navy px-3.5 py-1.5 rounded-full shadow-sm border border-gray-200 text-xs font-bold flex items-center gap-1 active:scale-95 active:bg-saffron active:text-white transition-all"
-            >
-              Next →
-            </button>
-          </div>
-
-          {/* Dots Indicator & Timer Bar */}
-          <div className="flex flex-col items-center mt-4 sm:mt-6 space-y-2 sm:space-y-3">
-            <div className="flex items-center space-x-1 sm:space-x-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                  className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 ${currentIndex === index
-                    ? "w-5 sm:w-8 bg-saffron"
-                    : "w-2 sm:w-2.5 bg-gray-300 hover:bg-gray-400"
-                    }`}
-                />
-              ))}
-            </div>
-
-            <p className="text-[11px] sm:text-xs text-gray-500 font-medium">
-              {currentIndex + 1} of {testimonials.length} (Auto-slides every 5 seconds)
-            </p>
-          </div>
-
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* 5. Frequently Asked Questions (FAQ) Section (BELOW Testimonials) */}
-      <section className="py-12 sm:py-16 px-4 bg-white border-t border-gray-100">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8 sm:mb-10">
-            <span className="text-indiagreen font-bold text-xs tracking-wider uppercase bg-indiagreen/10 px-3.5 py-1 rounded-full inline-block mb-2">
-              Got Questions?
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-navy">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-3.5">
-            {faqs.map((item, i) => (
-              <details key={i} className="border border-gray-200 rounded-xl p-4 sm:p-5 bg-white group hover:border-saffron/40 transition-colors">
-                <summary className="font-bold text-navy text-sm sm:text-base cursor-pointer flex items-center justify-between">
-                  <span>{item.q}</span>
-                  <span className="text-saffron font-bold text-base transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <p className="text-xs sm:text-sm text-gray-600 mt-3 pt-3 border-t border-gray-100 leading-relaxed">
-                  {item.a}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FaqSection />
 
       {/* 6. Contact Us Section (Boxed Card Container BELOW FAQ) */}
-      <section className="py-12 sm:py-16 px-4 bg-gradient-to-b from-cream/40 via-amber-50/20 to-cream/50 border-t border-amber-100">
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-amber-200/80">
-          <div className="text-center mb-8 sm:mb-10">
-            <span className="text-saffron font-bold text-xs tracking-wider uppercase bg-saffron/10 px-3.5 py-1 rounded-full inline-block mb-2 border border-saffron/20">
-              Get in Touch
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-navy">
-              Contact ISKCON Youth Forum
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1">
-              Have questions about the festival or registration? Send us a message below!
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-5 gap-6 sm:gap-8 bg-amber-50/40 p-6 sm:p-8 rounded-2xl border border-amber-100/90">
-            {/* Contact Info Sidebar */}
-            <div className="md:col-span-2 space-y-4 border-b md:border-b-0 md:border-r border-gray-100 pb-6 md:pb-0 md:pr-6">
-              <h3 className="font-bold text-navy text-base sm:text-lg mb-3">Reach Out To Us</h3>
-
-              <div className="flex items-start gap-3 text-xs sm:text-sm text-gray-700">
-                <span className="text-saffron text-base">📍</span>
-                <div>
-                  <p className="font-bold text-navy">Address</p>
-                  <p className="text-gray-600">3C Albert Road, Near Minto Park, Kolkata 700017</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 text-xs sm:text-sm text-gray-700">
-                <span className="text-saffron text-base">📧</span>
-                <div>
-                  <p className="font-bold text-navy">Email</p>
-                  <p className="text-gray-600">contact@iyfkolkata.org</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 text-xs sm:text-sm text-gray-700">
-                <span className="text-saffron text-base">📞</span>
-                <div>
-                  <p className="font-bold text-navy">Phone / WhatsApp</p>
-                  <p className="text-gray-600">+91 98765 43210</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <form onSubmit={handleContactSubmit} className="md:col-span-3 space-y-3.5">
-              <input
-                name="name"
-                value={contactForm.name}
-                onChange={handleContactChange}
-                placeholder="Full Name"
-                required
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-saffron"
-              />
-              <input
-                type="email"
-                name="email"
-                value={contactForm.email}
-                onChange={handleContactChange}
-                placeholder="Email Address"
-                required
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-saffron"
-              />
-              <input
-                name="phone"
-                value={contactForm.phone}
-                onChange={handleContactChange}
-                placeholder="Phone / WhatsApp Number (optional)"
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-saffron"
-              />
-              <textarea
-                name="message"
-                value={contactForm.message}
-                onChange={handleContactChange}
-                placeholder="Write your query or message..."
-                required
-                rows={4}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-saffron"
-              />
-              <button
-                type="submit"
-                disabled={contactStatus === "sending"}
-                className="w-full bg-saffron text-navy font-bold text-xs sm:text-sm py-3 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-xs disabled:opacity-60"
-              >
-                {contactStatus === "sending" ? "Sending Message..." : "Send Message"}
-              </button>
-
-              {contactStatus === "sent" && (
-                <p className="text-xs font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-lg text-center border border-emerald-200">
-                  ✓ Message sent successfully! We will get back to you soon.
-                </p>
-              )}
-              {contactStatus === "error" && (
-                <p className="text-xs font-bold text-red-600 bg-red-50 p-2.5 rounded-lg text-center border border-red-200">
-                  Failed to send message. Please try again.
-                </p>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
+      <ContactSection />
 
       {/* Side Floating Widget for UG Notice (Persisted in localStorage) */}
       {!isUgNoticeDismissed && (

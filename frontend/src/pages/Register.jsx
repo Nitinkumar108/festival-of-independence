@@ -88,47 +88,16 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    // Validate mandatory fields
-    if (!form.fullName.trim()) {
-      setError("Full Name is required.");
-      return;
-    }
-    if (!form.collegeId) {
-      setError("Please select your college or institution.");
-      return;
-    }
-    if (!form.email.trim()) {
-      setError("Email Address is required.");
-      return;
-    }
-    if (!emailVerified) {
-      setError("Please verify your Email address with OTP before registering.");
-      return;
-    }
-    if (!form.phoneNumber.trim()) {
-      setError("Phone Number is required.");
-      return;
-    }
-    if (!form.address.trim()) {
-      setError("Address is required.");
-      return;
-    }
-    if (!form.username.trim()) {
-      setError("Username is required.");
-      return;
-    }
-    if (!form.password) {
-      setError("Password is required.");
-      return;
-    }
-    if (!form.confirmPassword) {
-      setError("Confirm Password is required.");
-      return;
-    }
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+    if (!form.fullName.trim()) return setError("Full Name is required.");
+    if (!form.collegeId) return setError("Please select your college or institution.");
+    if (!form.email.trim()) return setError("Email Address is required.");
+    if (!emailVerified) return setError("Please verify your Email address with OTP before registering.");
+    if (!form.phoneNumber.trim()) return setError("Phone Number is required.");
+    if (!form.address.trim()) return setError("Address is required.");
+    if (!form.username.trim()) return setError("Username is required.");
+    if (!form.password) return setError("Password is required.");
+    if (!form.confirmPassword) return setError("Confirm Password is required.");
+    if (form.password !== form.confirmPassword) return setError("Passwords do not match.");
 
     setSubmitting(true);
     try {
@@ -152,198 +121,204 @@ export default function Register() {
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold text-navy mb-2">Student Registration</h1>
-      <p className="text-gray-600 mb-6">
-        Already registered?{" "}
-        <Link to="/login" className="text-gold font-medium">
-          Login here
-        </Link>
-        .
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Full Name */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-            Full Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            name="fullName"
-            value={form.fullName}
-            onChange={handleChange}
-            placeholder="e.g. Rahul Sharma"
-            required
-            className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-          />
+    <div className="w-full min-h-screen bg-slate-50/60 py-12 sm:py-16 px-4 font-sans text-slate-800">
+      <div className="max-w-xl mx-auto bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+        
+        {/* Header Title */}
+        <div className="space-y-1 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-black text-navy tracking-tight">Student Registration</h1>
+          <p className="text-xs text-gray-500 font-medium">
+            Already registered?{" "}
+            <Link to="/login" className="text-saffron font-bold hover:underline">
+              Login here
+            </Link>
+          </p>
         </div>
 
-        {/* College / Institution Selection */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-            College / Institution <span className="text-red-500">*</span>
-          </label>
-          <select
-            name="collegeId"
-            value={form.collegeId}
-            onChange={handleChange}
-            required
-            className="w-full border rounded-lg px-4 py-2.5 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-          >
-            <option value="">-- Select College / Institution --</option>
-            {colleges.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Email Verification Section */}
-        <div className="border rounded-xl p-4 bg-gray-50/50 space-y-2">
-          <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
-            Email Address (OTP Verification) <span className="text-red-500">*</span>
-          </label>
-          <div className="flex gap-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Full Name */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              Full Name <span className="text-red-500">*</span>
+            </label>
             <input
-              type="email"
-              name="email"
-              value={form.email}
+              name="fullName"
+              value={form.fullName}
               onChange={handleChange}
-              placeholder="e.g. rahul@example.com"
+              placeholder="e.g. Rahul Sharma"
               required
-              disabled={emailVerified}
-              className="flex-1 border rounded-lg px-4 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-navy/20 disabled:bg-gray-100"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy placeholder-gray-400 focus:outline-none focus:border-saffron"
             />
-            {!emailVerified ? (
-              <button
-                type="button"
-                onClick={handleSendEmailOtp}
-                disabled={emailOtpLoading || !form.email.trim()}
-                className="bg-navy text-white text-xs font-semibold px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50"
-              >
-                {emailOtpLoading ? "Sending..." : emailOtpSent ? "Resend OTP" : "Send OTP"}
-              </button>
-            ) : (
-              <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1">
-                ✓ Verified
-              </span>
+          </div>
+
+          {/* College / Institution Selection */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              College / Institution <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="collegeId"
+              value={form.collegeId}
+              onChange={handleChange}
+              required
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy focus:outline-none focus:border-saffron"
+            >
+              <option value="">-- Select College / Institution --</option>
+              {colleges.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Email Verification Section */}
+          <div className="border border-gray-200 rounded-2xl p-4 bg-gray-50/70 space-y-2">
+            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
+              Email Address (OTP Verification) <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="e.g. rahul@example.com"
+                required
+                disabled={emailVerified}
+                className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-medium text-navy focus:outline-none focus:border-saffron disabled:bg-gray-100"
+              />
+              {!emailVerified ? (
+                <button
+                  type="button"
+                  onClick={handleSendEmailOtp}
+                  disabled={emailOtpLoading || !form.email.trim()}
+                  className="bg-navy text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-saffron hover:text-navy transition-all disabled:opacity-50 flex-shrink-0"
+                >
+                  {emailOtpLoading ? "Sending..." : emailOtpSent ? "Resend OTP" : "Send OTP"}
+                </button>
+              ) : (
+                <span className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1">
+                  ✓ Verified
+                </span>
+              )}
+            </div>
+
+            {emailOtpSent && !emailVerified && (
+              <div className="flex gap-2 pt-1">
+                <input
+                  value={emailOtpCode}
+                  onChange={(e) => setEmailOtpCode(e.target.value)}
+                  placeholder="Enter 6-digit Email OTP"
+                  className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-medium text-navy focus:outline-none focus:border-saffron"
+                />
+                <button
+                  type="button"
+                  onClick={handleVerifyEmailOtp}
+                  disabled={emailOtpLoading || !emailOtpCode.trim()}
+                  className="bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-emerald-700 disabled:opacity-50 flex-shrink-0"
+                >
+                  Verify Code
+                </button>
+              </div>
+            )}
+            {emailOtpMsg && (
+              <p className={`text-xs ${emailVerified ? "text-emerald-700 font-bold" : "text-amber-700 font-medium"}`}>
+                {emailOtpMsg}
+              </p>
             )}
           </div>
 
-          {emailOtpSent && !emailVerified && (
-            <div className="flex gap-2 pt-1">
+          {/* Phone Number */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="phoneNumber"
+              value={form.phoneNumber}
+              onChange={handleChange}
+              placeholder="e.g. 9876543210"
+              required
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy placeholder-gray-400 focus:outline-none focus:border-saffron"
+            />
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              Address <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              placeholder="Full Address"
+              required
+              rows={2}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy placeholder-gray-400 focus:outline-none focus:border-saffron"
+            />
+          </div>
+
+          {/* Username */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              Choose a Username <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="Username"
+              required
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy placeholder-gray-400 focus:outline-none focus:border-saffron"
+            />
+          </div>
+
+          {/* Passwords */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                Password <span className="text-red-500">*</span>
+              </label>
               <input
-                value={emailOtpCode}
-                onChange={(e) => setEmailOtpCode(e.target.value)}
-                placeholder="Enter 6-digit Email OTP"
-                className="flex-1 border rounded-lg px-4 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Password"
+                required
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy placeholder-gray-400 focus:outline-none focus:border-saffron"
               />
-              <button
-                type="button"
-                onClick={handleVerifyEmailOtp}
-                disabled={emailOtpLoading || !emailOtpCode.trim()}
-                className="bg-emerald-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
-              >
-                Verify Code
-              </button>
             </div>
-          )}
-          {emailOtpMsg && (
-            <p className={`text-xs ${emailVerified ? "text-emerald-600 font-medium" : "text-amber-700"}`}>
-              {emailOtpMsg}
-            </p>
-          )}
-        </div>
-
-        {/* Phone Number */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-            Phone Number <span className="text-red-500">*</span>
-          </label>
-          <input
-            name="phoneNumber"
-            value={form.phoneNumber}
-            onChange={handleChange}
-            placeholder="e.g. 9876543210"
-            required
-            className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-          />
-        </div>
-
-        {/* Address */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-            Address <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            name="address"
-            value={form.address}
-            onChange={handleChange}
-            placeholder="Full Address"
-            required
-            rows={3}
-            className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-          />
-        </div>
-
-        {/* Username */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-            Choose a Username <span className="text-red-500">*</span>
-          </label>
-          <input
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            placeholder="Username"
-            required
-            className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-          />
-        </div>
-
-        {/* Passwords */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-              Password <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Password"
-              required
-              className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-            />
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                Confirm Password <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm Password"
+                required
+                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy placeholder-gray-400 focus:outline-none focus:border-saffron"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-              Confirm Password <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm Password"
-              required
-              className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/20"
-            />
-          </div>
-        </div>
 
-        {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
+          {error && <p className="text-xs font-bold text-red-600 bg-red-50 p-3 rounded-xl text-center border border-red-200">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={submitting || !emailVerified}
-          className="w-full bg-saffron text-navy font-bold px-6 py-3 rounded-lg hover:opacity-90 transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-        >
-          {submitting ? "Registering…" : "Complete Registration"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={submitting || !emailVerified}
+            className="w-full bg-saffron text-navy font-black py-3.5 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+          >
+            {submitting ? "Registering…" : "Complete Registration"}
+          </button>
+        </form>
+
+      </div>
     </div>
   );
 }
