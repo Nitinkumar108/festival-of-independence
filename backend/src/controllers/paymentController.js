@@ -1,19 +1,28 @@
 const crypto = require("crypto");
-const Razorpay = require("razorpay");
-const { Payment, Student } = require("../models");
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+// Razorpay disabled temporarily. To re-enable, uncomment Razorpay require and instance initialization below:
+// const Razorpay = require("razorpay");
+// const razorpay = new Razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder_id",
+//   key_secret: process.env.RAZORPAY_KEY_SECRET || "placeholder_secret",
+// });
+
+const { Payment, Student } = require("../models");
 
 /**
  * POST /api/payments/create-order
  * Student must be logged in (protect + requireRole("student")).
  * Creates a Razorpay order for the registration fee (or a donation amount).
+ * (Currently disabled - code preserved in template below)
  */
 async function createOrder(req, res, next) {
   try {
+    return res.status(200).json({
+      message: "Razorpay payments are currently disabled.",
+      disabled: true,
+    });
+
+    /* TEMPLATE FOR RAZORPAY CREATE ORDER:
     const { paymentType = "RegistrationFee", amount } = req.body;
 
     const amountInPaise =
@@ -45,6 +54,7 @@ async function createOrder(req, res, next) {
       currency: order.currency,
       keyId: process.env.RAZORPAY_KEY_ID,
     });
+    */
   } catch (err) {
     next(err);
   }
@@ -53,10 +63,16 @@ async function createOrder(req, res, next) {
 /**
  * POST /api/payments/verify
  * Called by the frontend right after Razorpay Checkout succeeds.
- * This is a CONVENIENCE update only — the webhook below is the source of truth.
+ * (Currently disabled - code preserved in template below)
  */
 async function verifyPayment(req, res, next) {
   try {
+    return res.status(200).json({
+      message: "Razorpay payment verification is currently disabled.",
+      disabled: true,
+    });
+
+    /* TEMPLATE FOR RAZORPAY VERIFY PAYMENT:
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     const expectedSignature = crypto
@@ -78,6 +94,7 @@ async function verifyPayment(req, res, next) {
     }
 
     res.json({ message: "Payment verified successfully." });
+    */
   } catch (err) {
     next(err);
   }
@@ -86,11 +103,13 @@ async function verifyPayment(req, res, next) {
 /**
  * POST /api/payments/webhook
  * Configure this exact URL in the Razorpay Dashboard.
- * Mounted with express.raw() in server.js so the signature can be verified
- * against the raw request body.
+ * (Currently disabled - code preserved in template below)
  */
 async function razorpayWebhook(req, res, next) {
   try {
+    return res.status(200).json({ received: true, disabled: true });
+
+    /* TEMPLATE FOR RAZORPAY WEBHOOK:
     const signature = req.headers["x-razorpay-signature"];
     const expected = crypto
       .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
@@ -117,6 +136,7 @@ async function razorpayWebhook(req, res, next) {
     }
 
     res.json({ received: true });
+    */
   } catch (err) {
     next(err);
   }
