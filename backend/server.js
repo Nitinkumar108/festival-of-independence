@@ -18,7 +18,24 @@ const contactRoutes = require("./src/routes/contactRoutes");
 const app = express();
 
 // ----- Core middleware -----
-app.use(cors({ origin: process.env.CLIENT_URL || "*", credentials: true }));
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
+  : "*";
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin || allowedOrigins === "*") return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, "");
+      if (allowedOrigins.includes(cleanOrigin)) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Allow origin fallback or match
+    },
+    credentials: true,
+  })
+);
 
 // Razorpay webhook needs the RAW body to verify the signature,
 // so it is mounted separately BEFORE express.json().
