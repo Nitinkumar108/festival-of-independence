@@ -7,12 +7,36 @@ import ContactSection from "../components/ContactSection.jsx";
 import FaqSection from "../components/FaqSection.jsx";
 
 const heroImages = [
-  "https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&w=1600&q=80", // Indian Flag flying proudly
-  "https://images.unsplash.com/photo-1597047084897-51e81819a499?auto=format&fit=crop&w=1600&q=80", // Youth Tiranga celebration & marching
-  "https://images.unsplash.com/photo-1569012871812-a3b6472ab07d?auto=format&fit=crop&w=1600&q=80", // Heritage & national pride monument
-  "https://images.unsplash.com/photo-1605649487212-47bdab06cf6f?auto=format&fit=crop&w=1600&q=80", // Vibrant Indian cultural festival & youth gathering
-  "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1600&q=80", // Iconic Indian sunrise & landscape over Bharat Varsha
-  "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1600&q=80"  // Historic Indian monument in golden sunlight
+  {
+    url: "/slideshow/national_flag.png",
+    name: "National Flag",
+    alt: "Indian National Flag"
+  },
+  {
+    url: "/slideshow/tovp_mayapur.png",
+    name: "TOVP Mayapur",
+    alt: "Temple of the Vedic Planetarium (TOVP), Mayapur"
+  },
+  {
+    url: "/slideshow/somnath_temple.png",
+    name: "Somnath Temple",
+    alt: "Somnath Temple, Gujarat"
+  },
+  {
+    url: "/slideshow/south_indian_temple.png",
+    name: "South Indian Temple",
+    alt: "South Indian Temple Architecture"
+  },
+  {
+    url: "/slideshow/taj_mahal.png",
+    name: "Taj Mahal",
+    alt: "Taj Mahal, Agra"
+  },
+  {
+    url: "/slideshow/lotus_temple.png",
+    name: "Lotus Temple of Delhi",
+    alt: "Lotus Temple, Delhi"
+  }
 ];
 
 const journeyMilestones = [
@@ -33,7 +57,7 @@ const journeyMilestones = [
   {
     step: 2,
     date: "13 OCTOBER 2026",
-    title: "LEVEL 1 COMPLETION WITH EXAM",
+    title: "LEVEL 1 COMPLETION",
     subtitle: "First Milestone Assessment",
     description: "Testing foundational knowledge, value orientation, and practical principles taught in Level 1.",
     badgeColor: "border-emerald-500 text-emerald-600 bg-emerald-50",
@@ -207,6 +231,14 @@ export default function Home() {
     setIsUgNoticeDismissed(true);
   }
 
+  const handlePrevSlide = () => {
+    setHeroIndex((prevIndex) => (prevIndex - 1 + heroImages.length) % heroImages.length);
+  };
+
+  const handleNextSlide = () => {
+    setHeroIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+  };
+
   useEffect(() => {
     const heroTimer = setInterval(() => {
       setHeroIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
@@ -218,19 +250,24 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen overflow-x-hidden">
 
-      {/* 1. Hero Section with Transparent Background Slideshow */}
+      {/* 1. Hero Section with Full Background Slideshow */}
       <section className="relative bg-navy text-white overflow-hidden py-16 sm:py-24 px-4">
         {/* Transparent Background Images Slideshow */}
         {heroImages.map((img, idx) => (
           <div
             key={idx}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${heroIndex === idx ? "opacity-65" : "opacity-0"
-              }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              heroIndex === idx ? "opacity-65" : "opacity-0"
+            }`}
           >
             <img
-              src={img}
-              alt="Festival of Independence Patriotic Youth"
-              className="w-full h-full object-cover"
+              src={img.url}
+              alt={img.alt}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/slideshow/somnath_temple.png";
+              }}
+              className="w-full h-full object-cover object-center"
             />
           </div>
         ))}
@@ -244,12 +281,15 @@ export default function Home() {
 
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <p className="uppercase tracking-wider text-saffron text-xs sm:text-sm font-bold mb-2 sm:mb-3">
-            IYF Kolkata presents on the 80th Independence Day of the Holy land of Bharat Varsha
+            ISKCON Youth Forum Kolkata presents on the 80th Independence Day of the Holy land of Bharat Varsha
           </p>
-          <h1 className="text-3xl sm:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-bold mb-2 sm:mb-3 leading-tight">
             Festival of <span className="text-transparent bg-clip-text bg-gradient-to-r from-saffron via-white to-indiagreen">Independence</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-white/80 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed px-2">
+          <p className="text-saffron/90 font-bold text-xs sm:text-base mb-3 tracking-wide uppercase">
+            A series of online courses for the UG college students of Kolkata
+          </p>
+          <p className="max-w-2xl mx-auto text-white/80 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed px-2">
             Exploring, inculcating and celebrating our nation's great social, cultural and spiritual heritage.
           </p>
 
@@ -269,26 +309,50 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <Link
-              to="/register"
-              className="inline-block bg-saffron text-navy font-bold text-sm sm:text-base px-6 sm:px-8 py-3 rounded-full hover:bg-indiagreen hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-            >
-              Register Now
-            </Link>
+            <div className="flex flex-col items-center gap-3">
+              <Link
+                to="/register"
+                className="inline-block bg-saffron text-navy font-bold text-sm sm:text-base px-8 sm:px-10 py-3.5 rounded-full hover:bg-indiagreen hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                Register Now
+              </Link>
+            </div>
           )}
+
+          {/* Download Event Brochure Button */}
+          <div className="mt-4 flex justify-center">
+            <a
+              href="/Festival of Independence_Brochure.pdf"
+              download="Festival_of_Independence_Brochure.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-saffron hover:text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full border border-saffron/50 backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-md"
+            >
+              <svg className="w-4 h-4 text-saffron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>📄 Download Event Brochure (PDF)</span>
+            </a>
+          </div>
         </div>
 
-        {/* Hero Slideshow Indicator Dots */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex space-x-1.5">
-          {heroImages.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setHeroIndex(idx)}
-              aria-label={`Go to hero slide ${idx + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-300 ${heroIndex === idx ? "w-5 bg-saffron" : "w-1.5 bg-white/40"
+        {/* Hero Slideshow Indicator Dots & Location Label */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5">
+          <div className="flex space-x-1.5">
+            {heroImages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setHeroIndex(idx)}
+                aria-label={`Go to hero slide ${idx + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  heroIndex === idx ? "w-6 bg-saffron" : "w-1.5 bg-white/40"
                 }`}
-            />
-          ))}
+              />
+            ))}
+          </div>
+          <span className="text-[11px] font-semibold text-white/90 bg-navy/70 px-3 py-0.5 rounded-full backdrop-blur-xs border border-white/20 shadow-xs">
+            📍 {heroImages[heroIndex].name}
+          </span>
         </div>
       </section>
 
@@ -302,22 +366,14 @@ export default function Home() {
               Nation Building Vision
             </span>
             <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-navy leading-tight max-w-3xl mx-auto">
-              Let's build a Nation of{" "}
+              Let's build a Nation with{" "}
+              <span className="text-navy">Clarity</span>,{" "}
               <span className="text-saffron">Character</span>,{" "}
-              <span className="text-indiagreen">Compassion</span> and{" "}
-              <span className="text-navy">Consciousness</span>
+              <span className="text-amber-600">Competence</span> and{" "}
+              <span className="text-indiagreen">Compassion</span>
             </h2>
           </div>
 
-          {/* Card 1: Freedom Quote */}
-          <div className="bg-white rounded-xl shadow-sm border border-amber-200 border-l-4 border-l-saffron p-4 sm:p-5 text-center transition-all hover:shadow-md">
-            <p className="text-xs sm:text-sm md:text-base font-bold tracking-wide text-navy uppercase leading-relaxed">
-              TRUE FREEDOM IS NOT JUST FROM A NATION,{" "}
-              <span className="text-saffron">BUT FROM IGNORANCE</span>,{" "}
-              <span className="text-saffron">FEAR</span> AND{" "}
-              <span className="text-saffron">SELFISHNESS</span>.
-            </p>
-          </div>
 
           {/* Card 2: Mission Statement */}
           <div className="bg-white rounded-xl shadow-sm border border-blue-100 border-l-4 border-l-navy p-4 sm:p-5 text-center transition-all hover:shadow-md">
@@ -329,6 +385,25 @@ export default function Home() {
               , by helping Indian youths to develop{" "}
               <span className="text-navy font-bold">broad consciousness</span> and{" "}
               <span className="text-indiagreen font-bold">pure conscience</span>.
+            </p>
+          </div>
+
+          {/* Card 3: Nasha Mukt Yuva Government Initiative Notice */}
+          <div className="bg-white rounded-xl shadow-sm border border-amber-200 border-l-4 border-l-saffron p-4 sm:p-5 text-center transition-all hover:shadow-md">
+            <p className="text-xs sm:text-sm md:text-base font-semibold text-navy leading-relaxed">
+              Specially designed to support the{" "}
+              <span className="text-saffron font-extrabold tracking-wide">
+                NASHA MUKT YUVA
+              </span>{" "}
+              for{" "}
+              <span className="text-indiagreen font-extrabold">
+                Viksit Bharat
+              </span>{" "}
+              initiative by the{" "}
+              <span className="font-extrabold text-navy">
+                Ministry of Youth Affairs and Sports, Government of India
+              </span>
+              ...
             </p>
           </div>
 

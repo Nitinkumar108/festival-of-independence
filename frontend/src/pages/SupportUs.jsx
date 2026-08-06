@@ -1,5 +1,4 @@
 import { useState } from "react";
-import upiQrCode from "../assets/upi_qr_code.png";
 
 export default function SupportUs() {
   const [copiedField, setCopiedField] = useState(null);
@@ -11,166 +10,209 @@ export default function SupportUs() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-50/50 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <div className="w-full min-h-screen bg-gradient-to-b from-white via-amber-50/30 to-cream py-12 sm:py-18 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-5xl mx-auto space-y-10">
         
         {/* Page Header */}
         <div className="text-center space-y-3 max-w-3xl mx-auto">
-          <span className="text-saffron font-bold text-xs uppercase tracking-wider bg-saffron/10 px-3.5 py-1 rounded-full border border-saffron/20">
+          <span className="text-saffron font-extrabold text-xs uppercase tracking-wider bg-saffron/10 px-4 py-1.5 rounded-full border border-saffron/30 shadow-xs">
             Support Our Cause
           </span>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-navy tracking-tight">
-            Support IYF Kolkata
+          <h1 className="text-3xl sm:text-5xl font-black text-navy tracking-tight">
+            Support ISKCON Youth Forum Kolkata
           </h1>
           <p className="text-xs sm:text-base text-gray-600 font-medium leading-relaxed">
             Your generous contributions empower thousands of undergraduate college students with character, clarity, and timeless values.
           </p>
         </div>
 
-        {/* 3 Organised Cards Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+        {/* 3 STRUCTURED SAFFRON THEME CARDS (Matching About Us card format) */}
+        <div className="space-y-8">
           
-          {/* CARD 1: DETAILS ABOUT US & OUR MISSION */}
-          <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <span className="inline-block text-xs font-extrabold text-saffron bg-saffron/10 px-3 py-1 rounded-full border border-saffron/20">
-                About Our Mission
+          {/* CARD 1: EMPOWERING YOUTH THROUGH VALUES & FINANCIAL TRANSPARENCY */}
+          <div className="bg-amber-50/90 border-2 border-saffron/40 rounded-3xl p-6 sm:p-8 shadow-md border-l-8 border-l-saffron transition-all hover:shadow-lg space-y-5">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-saffron/20 pb-3">
+              <span className="text-[11px] font-black text-saffron uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-saffron/30 shadow-2xs">
+                🎓 About Our Mission & Transparency
               </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-navy leading-snug">
-                Empowering Youth Through Values
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed">
-                Your contributions directly support IYF Kolkata's spiritual outreach, student development programs, leadership camps, and value-based education for college youth across premier institutes.
-              </p>
-
-              <div className="space-y-2.5 pt-2">
-                <div className="flex items-center gap-2.5 text-xs font-bold text-navy bg-amber-50/70 p-3 rounded-2xl border border-amber-200/60">
-                  <span className="text-saffron text-base">🎓</span>
-                  <span>Free Student Registration (0 Fees)</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-xs font-bold text-navy bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/60">
-                  <span className="text-indiagreen text-base">📖</span>
-                  <span>NEP 2020 & Indian Knowledge Systems</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-xs font-bold text-navy bg-blue-50/70 p-3 rounded-2xl border border-blue-200/60">
-                  <span className="text-blue-600 text-base">🌿</span>
-                  <span>Mental Resilience & Emotional Well-Being</span>
-                </div>
-              </div>
+              <span className="text-xs font-extrabold text-navy">
+                Zero-Tolerance Accounting Policy
+              </span>
             </div>
 
-            <div className="pt-4 border-t border-gray-100">
-              <p className="text-xs text-gray-500 font-medium italic">
-                "Thank you for helping us shape a responsible, value-driven generation."
+            <h2 className="text-xl sm:text-3xl font-black text-navy leading-snug">
+              Empowering Youth Through Values
+            </h2>
+
+            <div className="space-y-4 text-xs sm:text-sm text-gray-700 leading-relaxed font-medium">
+              <p>
+                As we register the students completely free, your valuable contribution will be used in organising the event, which means purchasing Zoom subscriptions, purchasing different web-hosting's, printing and circulating the promotional materials and other essential logistic expenses. After completion of each level of this course, we have planned a camp. So, your contribution will be used to sponsor Prasadam, rent the venue, arrange transport, and cover other essential costs.
               </p>
+              <p>
+                According to our zero-tolerance accounting policy, we publish details of each donation received and each expenditure of the funds. To get an inflow-outflow sheet, Please click the following link....
+              </p>
+            </div>
+
+            {/* Inflow-Outflow Financial Statement Sheet Box Link */}
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border-2 border-saffron/50 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-center sm:text-left">
+                <div className="w-10 h-10 rounded-xl bg-saffron/15 text-saffron font-black flex items-center justify-center text-lg flex-shrink-0">
+                  📊
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-navy text-xs sm:text-sm">Inflow-Outflow Financial Sheet</h4>
+                  <p className="text-[11px] text-gray-500 font-medium">View full itemized donation receipts & event expenditure log</p>
+                </div>
+              </div>
+              <a
+                href="#inflow-outflow"
+                onClick={(e) => {
+                  e.preventDefault();
+                  alert("Official Inflow-Outflow Statement sheet will open here.");
+                }}
+                className="bg-saffron text-navy font-extrabold text-xs px-5 py-2.5 rounded-xl hover:bg-navy hover:text-white transition-all shadow-xs flex items-center gap-1.5 flex-shrink-0"
+              >
+                <span>Click Here to View Sheet</span>
+                <span>→</span>
+              </a>
             </div>
           </div>
 
-          {/* CARD 2: ACCOUNT DETAILS (BANK TRANSFER) */}
-          <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <span className="inline-block text-xs font-extrabold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                Direct Bank Transfer
+          {/* CARD 2: DIRECT BANK TRANSFER (MIDDLE SEGMENT) */}
+          <div className="bg-orange-50/90 border-2 border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-md border-l-8 border-l-amber-600 transition-all hover:shadow-lg space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-300/40 pb-3">
+              <span className="text-[11px] font-black text-amber-700 uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-amber-300 shadow-2xs">
+                🏦 -: To Contribute :-
               </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-navy leading-snug">
-                Bank Account Details
-              </h2>
-              <p className="text-xs text-gray-500 font-medium">
-                Make a direct NEFT / RTGS / IMPS bank transfer to our official account:
+              <span className="text-xs font-extrabold text-navy">
+                NEFT / RTGS / IMPS
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-3xl font-black text-navy leading-snug">
+              Bank Account Details
+            </h2>
+
+            <p className="text-xs sm:text-sm text-gray-600 font-medium">
+              Make a direct bank transfer to our official ISKCON account:
+            </p>
+
+            {/* Bank Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs sm:text-sm font-medium">
+              
+              <div className="bg-white p-4 rounded-2xl border border-amber-200/80 space-y-0.5 shadow-2xs">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">A/C Name</span>
+                <span className="font-black text-navy text-base">ISKCON</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-amber-200/80 flex items-center justify-between shadow-2xs">
+                <div>
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">A/C No.</span>
+                  <span className="font-black text-navy tracking-wider text-base">005010100161718</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard("005010100161718", "acc")}
+                  className="text-xs font-bold text-saffron hover:text-navy px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200"
+                >
+                  {copiedField === "acc" ? "✓ Copied" : "Copy"}
+                </button>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-amber-200/80 flex items-center justify-between shadow-2xs">
+                <div>
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">IFSC Code</span>
+                  <span className="font-black text-navy tracking-wider text-base">UTIB0000005</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard("UTIB0000005", "ifsc")}
+                  className="text-xs font-bold text-saffron hover:text-navy px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200"
+                >
+                  {copiedField === "ifsc" ? "✓ Copied" : "Copy"}
+                </button>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-amber-200/80 space-y-0.5 shadow-2xs">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Bank Name</span>
+                <span className="font-black text-navy text-sm">AXIS BANK LTD.</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-amber-200/80 space-y-0.5 shadow-2xs sm:col-span-2 lg:col-span-2">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Branch</span>
+                <span className="font-black text-navy text-sm">KOLKATA MAIN BRANCH</span>
+              </div>
+
+            </div>
+
+            {/* BIG BOLD NOTICE BOX FOR WHATSAPP TRANSACTION PROOF & CITIZENSHIP */}
+            <div className="bg-gradient-to-r from-red-600 to-amber-600 text-white rounded-2xl p-5 sm:p-6 shadow-lg space-y-3 border-2 border-white">
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest bg-black/20 px-3 py-1 rounded-full w-fit">
+                ⚠️ CRITICAL DONOR INSTRUCTIONS
+              </div>
+
+              <p className="text-sm sm:text-base font-black leading-snug tracking-wide">
+                You must share the screenshot/ transaction ID and date of your transfer in our WhatsApp number (
+                <a href="https://wa.me/916290749253" target="_blank" rel="noreferrer" className="underline text-yellow-300 hover:text-white">
+                  +91 6290749253
+                </a>
+                ), alongwith your name and postal Address. Otherwise, the contribution will not be directed towards this cause.
               </p>
 
-              {/* Detailed Bank Info List */}
-              <div className="space-y-3 text-xs sm:text-sm font-medium pt-1">
-                
-                <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200/70 space-y-0.5 relative group">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Account Name</span>
-                  <span className="font-extrabold text-navy">International Youth Forum Kolkata</span>
-                </div>
-
-                <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200/70 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Account Number</span>
-                    <span className="font-extrabold text-navy tracking-wider">123456789012</span>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard("123456789012", "acc")}
-                    className="text-xs font-bold text-saffron hover:text-navy px-2.5 py-1 rounded-lg bg-white border border-gray-200"
-                  >
-                    {copiedField === "acc" ? "✓ Copied" : "Copy"}
-                  </button>
-                </div>
-
-                <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200/70 space-y-0.5">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">Bank Name</span>
-                  <span className="font-extrabold text-navy">State Bank of India</span>
-                </div>
-
-                <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200/70 flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">IFSC Code</span>
-                    <span className="font-extrabold text-navy tracking-wider">SBIN0001234</span>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard("SBIN0001234", "ifsc")}
-                    className="text-xs font-bold text-saffron hover:text-navy px-2.5 py-1 rounded-lg bg-white border border-gray-200"
-                  >
-                    {copiedField === "ifsc" ? "✓ Copied" : "Copy"}
-                  </button>
-                </div>
-
+              <div className="pt-2 border-t border-white/30 flex flex-wrap items-center justify-between gap-2 text-xs font-extrabold">
+                <span className="bg-white/20 px-3 py-1 rounded-xl">
+                  🇮🇳 The donor must be an Indian citizen.
+                </span>
+                <span className="text-amber-100">
+                  For receipts: iyfkolkatarg@gmail.com
+                </span>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-gray-100">
-              <p className="text-[11px] text-gray-500">
-                For receipts, please email <span className="font-bold text-navy">contact@iyfkolkata.org</span> after transfer.
-              </p>
-            </div>
           </div>
 
-          {/* CARD 3: INSTANT UPI SCAN & QR CODE */}
-          <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center justify-between text-center space-y-6">
-            <div className="space-y-4 w-full">
-              <span className="inline-block text-xs font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                Instant UPI Payment
+          {/* CARD 3: CONVENIENT ONLINE DONATION & RAZORPAY LINK (LAST SEGMENT) */}
+          <div className="bg-amber-100/70 border-2 border-saffron rounded-3xl p-6 sm:p-8 shadow-md border-l-8 border-l-saffron transition-all hover:shadow-lg space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-saffron/30 pb-3">
+              <span className="text-[11px] font-black text-saffron uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-saffron/40 shadow-2xs">
+                🔗 Convenient Online Payment
               </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-navy leading-snug">
-                Scan QR Code
-              </h2>
+              <span className="text-xs font-extrabold text-navy">
+                Razorpay / UPI / Cards
+              </span>
+            </div>
 
-              {/* QR Code Container */}
-              <div className="bg-amber-50/50 p-4 rounded-3xl border border-amber-200/80 inline-block shadow-xs">
-                <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
-                  <img
-                    src={upiQrCode}
-                    alt="UPI Donation QR Code"
-                    className="w-44 h-44 sm:w-48 sm:h-48 object-contain rounded-xl"
-                  />
+            <h2 className="text-xl sm:text-3xl font-black text-navy leading-snug">
+              At last, donate in your most convenient way by clicking the following 🔗
+            </h2>
+
+            {/* RAZORPAY PAYMENT LINK BOX */}
+            <div className="bg-white p-5 sm:p-6 rounded-2xl border-2 border-saffron shadow-sm space-y-4">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3 text-center md:text-left">
+                  <div className="w-12 h-12 rounded-2xl bg-saffron text-navy font-black flex items-center justify-center text-2xl shadow-xs flex-shrink-0">
+                    💳
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-navy">Razorpay Online Payment Portal</h3>
+                    <p className="text-xs text-gray-600 font-medium">Instant contribution via Cards, UPI, NetBanking & Digital Wallets</p>
+                  </div>
                 </div>
-                <div className="mt-3 flex items-center justify-center gap-2 bg-white px-3 py-1.5 rounded-full border border-amber-200 text-xs font-extrabold text-navy">
-                  <span>UPI ID:</span>
-                  <span className="text-saffron">iyfkolkata@sbi</span>
-                  <button
-                    onClick={() => copyToClipboard("iyfkolkata@sbi", "upi")}
-                    className="text-[10px] bg-amber-50 text-slate-700 hover:text-navy px-1.5 py-0.5 rounded border border-amber-200"
-                  >
-                    {copiedField === "upi" ? "✓" : "Copy"}
-                  </button>
-                </div>
+
+                <a
+                  href="https://razorpay.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert("The Razorpay payment gateway page link is currently being integrated and will open here shortly.");
+                  }}
+                  className="bg-saffron text-navy font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl hover:bg-navy hover:text-white transition-all shadow-md hover:shadow-lg flex items-center gap-2 flex-shrink-0"
+                >
+                  <span>🔗 Click to Donate via Razorpay</span>
+                  <span>→</span>
+                </a>
               </div>
             </div>
 
-            <div className="w-full pt-4 border-t border-gray-100 space-y-2">
-              <p className="text-xs text-gray-500 font-medium">
-                Scan using any UPI App:
-              </p>
-              <div className="flex justify-center flex-wrap gap-1.5 text-[11px] font-extrabold text-navy">
-                <span className="bg-gray-100 px-2.5 py-1 rounded-lg">GPay</span>
-                <span className="bg-gray-100 px-2.5 py-1 rounded-lg">PhonePe</span>
-                <span className="bg-gray-100 px-2.5 py-1 rounded-lg">Paytm</span>
-                <span className="bg-gray-100 px-2.5 py-1 rounded-lg">BHIM</span>
-              </div>
-            </div>
           </div>
 
         </div>

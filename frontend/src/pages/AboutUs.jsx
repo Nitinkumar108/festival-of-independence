@@ -7,43 +7,87 @@ export default function AboutUs() {
   return (
     <div className="w-full min-h-screen bg-white text-slate-800 font-sans overflow-x-hidden">
       
-      {/* 1. HERO HEADER BANNER WITH BACKGROUND IMAGE */}
-      <section className="relative bg-navy text-white pt-14 sm:pt-20 pb-24 sm:pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden text-center">
+      {/* 1. HERO HEADER BANNER WITH LOGOS & PURPOSE & LEGACY */}
+      <section className="relative bg-navy text-white pt-6 sm:pt-8 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Background Image with Dark Navy Gradient Overlay */}
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
             alt="About Us Campus Header"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-20"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy/90 via-navy/85 to-navy/95 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-navy/95 via-navy/90 to-navy/95"></div>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-5 relative z-10">
-          <span className="inline-flex items-center gap-2 bg-saffron/20 text-saffron font-extrabold text-xs px-4 py-1.5 rounded-full border border-saffron/40 shadow-sm backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-saffron animate-pulse"></span>
-            About ISKCON Youth Forum (IYF Kolkata)
-          </span>
+        <div className="w-full max-w-[1400px] mx-auto relative z-10">
+          
+          {/* Top-Aligned Flex Layout: Top Left | Center | Top Right */}
+          <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-4 lg:gap-6">
+            
+            {/* TOP EXTREME LEFT: Circular ISKCON Kolkata Logo + Text */}
+            <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-1 min-w-[170px] sm:min-w-[190px]">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-saffron/90 shadow-xl overflow-hidden bg-white p-1.5 flex items-center justify-center">
+                <img
+                  src="/iskcon_kolkata_logo.png"
+                  alt="ISKCON Kolkata Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <h3 className="font-extrabold text-saffron text-xs sm:text-sm tracking-wide pt-0.5">
+                ISKCON Youth Forum
+              </h3>
+              <p className="text-[10px] sm:text-[11px] text-white/80 font-medium leading-tight max-w-[180px]">
+                Youth wing of International Society for Krishna Consciousness
+              </p>
+            </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Our Purpose, Legacy & <span className="text-saffron">Philosophy</span>
-          </h1>
+            {/* CENTER: OUR PURPOSE & LEGACY */}
+            <div className="max-w-2xl text-center space-y-3 pt-2 md:pt-0">
+              <span className="inline-flex items-center gap-2 bg-saffron/20 text-saffron font-extrabold text-xs px-4 py-1 rounded-full border border-saffron/40 shadow-sm backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-saffron animate-pulse"></span>
+                Our Purpose & Legacy
+              </span>
 
-          <p className="text-xs sm:text-base text-gray-200 font-medium max-w-2xl mx-auto leading-relaxed">
-            For over two decades, IYF Kolkata has been nurturing India's youth across premier academic institutions with character, resilience, and timeless values.
-          </p>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                Our Purpose, Legacy & <span className="text-saffron">Philosophy</span>
+              </h1>
 
-          <div className="pt-2 flex flex-wrap justify-center gap-2.5 text-xs font-bold">
-            <span className="bg-white/10 text-white px-4 py-2 rounded-2xl border border-white/20 backdrop-blur-md shadow-xs">
-              🏛️ 20+ Years Serving Youth
-            </span>
-            <span className="bg-white/10 text-saffron px-4 py-2 rounded-2xl border border-saffron/30 backdrop-blur-md shadow-xs">
-              📖 Aligned with NEP 2020
-            </span>
-            <span className="bg-white/10 text-emerald-400 px-4 py-2 rounded-2xl border border-emerald-400/30 backdrop-blur-md shadow-xs">
-              🌳 Indian Knowledge Systems (IKS)
-            </span>
+              <p className="text-xs sm:text-base text-gray-200 font-medium leading-relaxed px-2">
+                For over two decades, ISKCON Youth Forum (IYF Kolkata) has been nurturing India's youth across premier academic institutions with character, resilience, and timeless values.
+              </p>
+
+              <div className="pt-1 flex flex-wrap justify-center gap-2 text-xs font-bold">
+                <span className="bg-white/10 text-white px-3.5 py-1.5 rounded-xl border border-white/20 backdrop-blur-md shadow-xs">
+                  🏛️ 20+ Years Serving Youth
+                </span>
+                <span className="bg-white/10 text-saffron px-3.5 py-1.5 rounded-xl border border-saffron/30 backdrop-blur-md shadow-xs">
+                  📖 Aligned with NEP 2020
+                </span>
+                <span className="bg-white/10 text-emerald-400 px-3.5 py-1.5 rounded-xl border border-emerald-400/30 backdrop-blur-md shadow-xs">
+                  🌳 Indian Knowledge Systems
+                </span>
+              </div>
+            </div>
+
+            {/* TOP EXTREME RIGHT: Circular Prabhupada Photo + Text */}
+            <div className="flex flex-col items-center md:items-end text-center md:text-right space-y-1 min-w-[170px] sm:min-w-[190px]">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-saffron/90 shadow-xl overflow-hidden bg-white/10">
+                <img
+                  src="/prabhupada_portrait.png"
+                  alt="His Divine Grace A.C. Bhaktivedanta Swami Srila Prabhupada"
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <h3 className="font-extrabold text-saffron text-xs sm:text-sm tracking-wide pt-0.5">
+                Founder Acharya:
+              </h3>
+              <p className="text-[10px] sm:text-[11px] text-white/90 font-bold leading-tight max-w-[180px]">
+                His Divine Grace A.C. Bhaktivedanta Swami Srila Prabhupada
+              </p>
+            </div>
+
           </div>
+
         </div>
       </section>
 
@@ -86,75 +130,262 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* 2. WHY WE STARTED (2 Saffron & Light Blue Styled Bento Cards) */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto space-y-8">
+      {/* 2. MAIN ORGANIZATIONAL HERITAGE SECTIONS (SIDE-BY-SIDE CARDS WITH IMAGES & SAFFRON THEME) */}
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto space-y-16 sm:space-y-24">
           
-          <div className="text-center space-y-2">
-            <span className="text-saffron font-bold text-xs uppercase tracking-wider bg-saffron/10 px-3.5 py-1 rounded-full border border-saffron/20">
-              Foundational Need
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-navy tracking-tight">
-              Why We Started
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500 font-medium">
-              Addressing the real challenges faced by students today
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-stretch">
+          {/* SECTION 1: ABOUT ISKCON (Photo Left | Content Right) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
             
-            {/* Left Card: Soft Saffron Theme */}
-            <div className="md:col-span-6 bg-amber-50/80 border border-saffron/30 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="inline-block text-xs font-extrabold text-red-600 bg-red-50 px-3.5 py-1 rounded-full border border-red-200">
-                  A Growing Concern
-                </span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-navy leading-snug">
-                  Academic Excellence Alone Is Not Enough
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed font-medium">
-                  Data shows student stress and mental health challenges have increased steadily over the past decade. Technical training without emotional grounding leaves youth vulnerable.
-                </p>
+            {/* Left Photo Composition with Overlapping Badge */}
+            <div className="lg:col-span-6 relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-100 bg-amber-50 group">
+                <img
+                  src="/about/iskcon_global.png"
+                  alt="About ISKCON Global Movement"
+                  className="w-full h-[320px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
               </div>
 
-              <div className="bg-white/90 p-4 sm:p-5 rounded-2xl border border-amber-200 shadow-2xs">
-                <p className="text-xs sm:text-sm font-extrabold text-navy italic leading-snug">
-                  "How do we prepare students? Only for successful careers... or for a meaningful, resilient and responsible life?"
-                </p>
-                <p className="text-[11px] text-saffron font-bold pt-1.5">— IYF Educational Vision</p>
-              </div>
-            </div>
-
-            {/* Right Card: Light Blue Theme */}
-            <div className="md:col-span-6 bg-blue-50/80 border border-blue-200 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <span className="inline-block text-xs font-extrabold text-blue-700 bg-blue-100 px-3.5 py-1 rounded-full border border-blue-300">
-                  Nationwide Outreach
-                </span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-navy leading-snug">
-                  Engaging Premier Institutions Across India
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed font-medium">
-                  Our youth seminars and leadership modules have guided students across premier technical institutes and state universities:
-                </p>
-
-                {/* Institution Badges */}
-                <div className="flex flex-wrap gap-2 text-xs font-bold text-navy pt-1">
-                  {["IIT Bombay", "IIT Delhi", "IIT Madras", "IIT Kharagpur", "NIT Trichy", "NIT Warangal", "IIEST Shibpur"].map((inst, i) => (
-                    <span key={i} className="bg-white text-navy px-3 py-1.5 rounded-xl border border-blue-200 shadow-2xs">
-                      {inst}
-                    </span>
-                  ))}
+              {/* Overlapping Floating Saffron Stat Badge (Reference style) */}
+              <div className="absolute -bottom-5 -right-2 sm:bottom-6 sm:-right-6 bg-saffron text-navy rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-white max-w-[220px] sm:max-w-[250px] transition-transform hover:scale-105">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl sm:text-3xl font-black">700+</span>
+                  <div className="text-[11px] sm:text-xs font-extrabold uppercase leading-tight">
+                    Major Centers & Temples Worldwide
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-blue-200/60">
-                <p className="text-xs font-bold text-indiagreen flex flex-wrap gap-x-2 gap-y-1">
-                  <span>• Character Development</span>
-                  <span>• Emotional Well-Being</span>
-                  <span>• Purpose & Clarity</span>
+              {/* Top-Left Floating Badge */}
+              <div className="absolute top-4 left-4 bg-navy/95 text-white px-3.5 py-1.5 rounded-full text-xs font-bold border border-saffron/40 shadow-lg backdrop-blur-md">
+                🌐 Global Spiritual Movement
+              </div>
+            </div>
+
+            {/* Right Text Content */}
+            <div className="lg:col-span-6 space-y-4">
+              <span className="inline-flex items-center gap-2 bg-saffron/10 text-saffron font-extrabold text-xs px-3.5 py-1 rounded-full border border-saffron/30">
+                <span className="w-2 h-2 rounded-full bg-saffron animate-pulse"></span>
+                About ISKCON
+              </span>
+
+              <h2 className="text-2xl sm:text-4xl font-black text-navy leading-snug">
+                The International Society for <span className="text-saffron">Krishna Consciousness</span>
+              </h2>
+
+              <div className="space-y-3 text-xs sm:text-sm text-gray-700 font-medium leading-relaxed">
+                <p>
+                  The International Society for Krishna Consciousness (ISKCON), otherwise known as the Hare Krishna movement, includes 700+ major centers, temples and rural communities, 110+ affiliated vegetarian restaurants, thousands of namahattas or local meeting groups, a wide variety of community projects, and millions of congregational members worldwide. ISKCON has expanded widely since its founding by His Divine Grace A. C. Bhaktivedanta Swami Prabhupāda in New York City in 1966.
                 </p>
+                <p>
+                  ISKCON belongs to the Gaudiya-Vaishnava sampradāya, a monotheistic tradition within the Vedic or Hindu culture. Philosophically it is based on the Sanskrit texts Bhagavad-gītā and the Bhagavat Purana, or Srimad Bhagavatam. These are the historic texts of the devotional bhakti yoga tradition, which teaches that the ultimate goal for all living beings is to reawaken their love for God, or Lord Krishna, the “all-attractive one”.
+                </p>
+              </div>
+
+              {/* Checkmark Feature List (Matching Reference) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs font-bold text-navy">
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Gauḍīya-Vaiṣṇava Tradition</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Bhagavad-gītā Wisdom</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Śrīmad-Bhāgavatam</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Bhakti Yoga Path</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* COUNTER STATS BAR (Matching Reference Image Dark Green/Saffron Bar) */}
+          <div className="bg-gradient-to-r from-navy via-slate-900 to-navy text-white rounded-3xl p-6 sm:p-10 shadow-2xl border-2 border-saffron/40">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+              
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-saffron">700+</div>
+                <p className="text-xs sm:text-sm font-bold text-gray-200 uppercase tracking-wider">
+                  Global Centers & Temples
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-saffron">110+</div>
+                <p className="text-xs sm:text-sm font-bold text-gray-200 uppercase tracking-wider">
+                  Govinda's Restaurants
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-saffron">1971</div>
+                <p className="text-xs sm:text-sm font-bold text-gray-200 uppercase tracking-wider">
+                  First India Center (Kolkata)
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-saffron">20+</div>
+                <p className="text-xs sm:text-sm font-bold text-gray-200 uppercase tracking-wider">
+                  Years Serving Youth
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          {/* SECTION 2: ABOUT ISKCON KOLKATA (Content Left | Photo Right - Alternating Layout) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+            
+            {/* Left Text Content */}
+            <div className="lg:col-span-6 space-y-4 order-2 lg:order-1">
+              <span className="inline-flex items-center gap-2 bg-saffron/10 text-saffron font-extrabold text-xs px-3.5 py-1 rounded-full border border-saffron/30">
+                <span className="w-2 h-2 rounded-full bg-saffron animate-pulse"></span>
+                About ISKCON Kolkata
+              </span>
+
+              <h2 className="text-2xl sm:text-4xl font-black text-navy leading-snug">
+                First ISKCON Center in India <span className="text-saffron">(Est. May 23, 1971)</span>
+              </h2>
+
+              <div className="text-xs sm:text-sm text-gray-700 font-medium leading-relaxed">
+                <p>
+                  After establishing many temples all over the world, Srila A.C. Bhaktivedanta Swami Prabhupada returned to India in August 1970. He established ISKCON’s first center in India in Kolkata on 23rd May, 1971 at 3C Albert Road, Kolkata – 700017. He came to Kolkata along with his foreign disciples. Shaven – headed Westerners, with sikhas, Vaisnava tilaka, saffron robes, playing mrdangas and karatalas, chanting Hare Krishna, quoting Sanskrit verses eloquently created sensation in Kolkata.
+                </p>
+              </div>
+
+              {/* Checkmark Feature List */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs font-bold text-navy">
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Est. 23rd May, 1971</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>3C Albert Road, Kolkata</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Founded by Srila Prabhupada</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Spiritual Hub of Bengal</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Photo Composition with Overlapping Badge */}
+            <div className="lg:col-span-6 relative order-1 lg:order-2">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-100 bg-amber-50 group">
+                <img
+                  src="/about/iskcon_kolkata.png"
+                  alt="ISKCON Kolkata Albert Road Center"
+                  className="w-full h-[320px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+              </div>
+
+              {/* Overlapping Floating Badge */}
+              <div className="absolute -bottom-5 -left-2 sm:bottom-6 sm:-left-6 bg-navy text-white rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-saffron max-w-[240px] sm:max-w-[270px] transition-transform hover:scale-105">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl sm:text-3xl">📍</span>
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-200 leading-snug">
+                    <strong className="text-saffron block text-xs sm:text-sm">3C Albert Road</strong>
+                    Kolkata – 700017, West Bengal
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* SECTION 3: ABOUT ISKCON YOUTH FORUM (Photo Left | Content Right) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+            
+            {/* Left Photo Composition with Overlapping Badge */}
+            <div className="lg:col-span-6 relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-100 bg-amber-50 group">
+                <img
+                  src="/about/iyf_learning.png"
+                  alt="ISKCON Youth Forum Seminar Learning"
+                  className="w-full h-[320px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+              </div>
+
+              {/* Overlapping Floating Badge */}
+              <div className="absolute -bottom-5 -right-2 sm:bottom-6 sm:-right-6 bg-saffron text-navy rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-white max-w-[230px] sm:max-w-[260px] transition-transform hover:scale-105">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl sm:text-3xl font-black">20+</span>
+                  <div className="text-[11px] sm:text-xs font-extrabold uppercase leading-tight">
+                    Years Nurturing & Guiding College Youth
+                  </div>
+                </div>
+              </div>
+
+              {/* Top-Left Floating Badge */}
+              <div className="absolute top-4 left-4 bg-navy/95 text-white px-3.5 py-1.5 rounded-full text-xs font-bold border border-saffron/40 shadow-lg backdrop-blur-md">
+                🎓 Youth Empowerment Wing
+              </div>
+            </div>
+
+            {/* Right Text Content */}
+            <div className="lg:col-span-6 space-y-4">
+              <span className="inline-flex items-center gap-2 bg-saffron/10 text-saffron font-extrabold text-xs px-3.5 py-1 rounded-full border border-saffron/30">
+                <span className="w-2 h-2 rounded-full bg-saffron animate-pulse"></span>
+                About ISKCON Youth Forum
+              </span>
+
+              <h2 className="text-2xl sm:text-4xl font-black text-navy leading-snug">
+                Empowering Youth with <span className="text-saffron">Character & Clarity</span>
+              </h2>
+
+              <div className="space-y-3 text-xs sm:text-sm text-gray-700 font-medium leading-relaxed">
+                <p>
+                  ISKCON Youth Forum (IYF Kolkata) is the dedicated youth wing of ISKCON Kolkata, empowering undergraduate college students with character, emotional resilience, mind management, and timeless leadership values.
+                </p>
+                <p>
+                  Through value-education courses, retreats, conventions, and campus outreach aligned with NEP 2020 and Indian Knowledge Systems (IKS), IYF Kolkata nurtures youth to become responsible, value-driven leaders of tomorrow.
+                </p>
+              </div>
+
+              {/* Checkmark Feature List */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs font-bold text-navy">
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>NEP 2020 Aligned</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Indian Knowledge Systems</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Value Education Courses</span>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                  <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
+                  <span>Retreats & Conventions</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Link
+                  to="/register"
+                  className="inline-flex items-center gap-2 bg-saffron text-navy font-black text-xs sm:text-sm px-6 py-3.5 rounded-2xl hover:bg-navy hover:text-white transition-all shadow-md hover:shadow-lg"
+                >
+                  <span>Join IYF Programs (UG Students)</span>
+                  <span>→</span>
+                </Link>
               </div>
             </div>
 
@@ -169,7 +400,7 @@ export default function AboutUs() {
           
           <div className="text-center space-y-2 max-w-2xl mx-auto">
             <span className="text-saffron font-bold text-xs uppercase tracking-wider bg-saffron/10 px-3.5 py-1 rounded-full border border-saffron/20">
-              Core Philosophy
+              Festival of Independence
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-navy tracking-tight">
               The 3 Philosophical Pillars of Real Freedom

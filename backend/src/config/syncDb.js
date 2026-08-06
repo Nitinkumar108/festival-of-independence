@@ -13,8 +13,8 @@ async function run() {
   await sequelize.sync({ alter: true });
 
   // Seed default colleges
-  const defaultColleges = ["IIEST Shibpur"];
-  for (const name of defaultColleges) {
+  const { DEFAULT_COLLEGES } = require("../controllers/collegeController");
+  for (const name of DEFAULT_COLLEGES) {
     const [college, created] = await College.findOrCreate({ where: { name } });
     if (created) {
       console.log(`Seed college created: ${name}`);

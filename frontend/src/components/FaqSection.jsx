@@ -9,12 +9,12 @@ const faqs = [
   {
     id: 2,
     q: "Is there a registration fee?",
-    a: "No, registration for the Festival of Independence program is completely free of cost. There are no hidden fees or charges.",
+    a: "There will be very nominal registration fees for the camps. That will be collected before the camp",
   },
   {
     id: 3,
     q: "How do I get my class/program joining link?",
-    a: "Once logged in, your student dashboard shows the upcoming program schedule along with joining links, venue details, and notifications.",
+    a: "Other than that, registered students will get the joining links in their mail IDs and college-wise WhatsApp groups.",
   },
   {
     id: 4,
