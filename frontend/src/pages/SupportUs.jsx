@@ -181,7 +181,7 @@ export default function SupportUs() {
             </div>
 
             <h2 className="text-xl sm:text-3xl font-black text-navy leading-snug">
-              At last, donate in your most convenient way by clicking the following 🔗
+              Donate in your most convenient way by clicking the following 🔗
             </h2>
 
             {/* RAZORPAY PAYMENT LINK BOX */}
@@ -198,16 +198,12 @@ export default function SupportUs() {
                 </div>
 
                 <a
-                  href="https://razorpay.com"
+                  href="https://rzp.io/rzp/IYFK"
                   target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert("The Razorpay payment gateway page link is currently being integrated and will open here shortly.");
-                  }}
+                  rel="noopener noreferrer"
                   className="bg-saffron text-navy font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl hover:bg-navy hover:text-white transition-all shadow-md hover:shadow-lg flex items-center gap-2 flex-shrink-0"
                 >
-                  <span>🔗 Click to Donate via Razorpay</span>
+                  <span>🔗 Click to Donate with Razorpay</span>
                   <span>→</span>
                 </a>
               </div>

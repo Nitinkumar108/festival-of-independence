@@ -9,9 +9,11 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState("students"); // 'students', 'colleges', 'notifications', 'events', 'team', 'profile'
 
-  // Students state
+  // Students state & filters
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedCollege, setSelectedCollege] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [loadingStudents, setLoadingStudents] = useState(true);
 
@@ -45,22 +47,45 @@ export default function AdminDashboard() {
   const [addingCollege, setAddingCollege] = useState(false);
   const [collegeFeedback, setCollegeFeedback] = useState("");
 
+  // Super Admin Privilege Check
+  const isSuperAdmin = user?.role === "SuperAdmin" || user?.adminRole === "SuperAdmin";
+
   // Admin Team state
   const [adminTeam, setAdminTeam] = useState([]);
   const [adminForm, setAdminForm] = useState({ name: "", email: "", password: "", role: "VolunteerAdmin" });
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [adminFeedback, setAdminFeedback] = useState("");
 
+  // Edit Admin state (Super Admin only)
+  const [editingAdmin, setEditingAdmin] = useState(null);
+  const [editAdminForm, setEditAdminForm] = useState({ name: "", email: "", role: "VolunteerAdmin", password: "" });
+  const [savingEditAdmin, setSavingEditAdmin] = useState(false);
+  const [editAdminFeedback, setEditAdminFeedback] = useState("");
+
   // Admin Profile Form State
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "IYF Kolkata Admin",
     email: user?.email || "nitin.231218@gmail.com",
-    role: user?.role || "SuperAdmin",
+    role: user?.role || user?.adminRole || "SuperAdmin",
   });
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        name: user.name || "Admin",
+        email: user.email || "",
+        role: user.role || user.adminRole || "VolunteerAdmin",
+      });
+    }
+  }, [user]);
 
   // Contact Messages Inbox state
   const [contactMessages, setContactMessages] = useState([]);
   const [loadingContactMsgs, setLoadingContactMsgs] = useState(false);
+
+  useEffect(() => {
+    fetchColleges();
+  }, []);
 
   useEffect(() => {
     if (activeTab === "students") fetchStudents();
@@ -69,7 +94,7 @@ export default function AdminDashboard() {
     if (activeTab === "colleges") fetchColleges();
     if (activeTab === "team") fetchAdminTeam();
     if (activeTab === "messages") fetchContactMessages();
-  }, [activeTab, paymentStatus]);
+  }, [activeTab, paymentStatus, selectedCollege, selectedDate]);
 
   async function fetchContactMessages() {
     setLoadingContactMsgs(true);
@@ -87,7 +112,12 @@ export default function AdminDashboard() {
     setLoadingStudents(true);
     try {
       const res = await api.get("/admin/students", {
-        params: { search: search || undefined, paymentStatus: paymentStatus || undefined },
+        params: {
+          search: search || undefined,
+          paymentStatus: paymentStatus || undefined,
+          college: selectedCollege || undefined,
+          date: selectedDate || undefined,
+        },
       });
       setStudents(res.data);
     } finally {
@@ -96,12 +126,16 @@ export default function AdminDashboard() {
   }
 
   async function handleDeleteStudent(id, name) {
+    if (!isSuperAdmin) {
+      alert("Only Super Admins have permission to delete student accounts.");
+      return;
+    }
     if (!confirm(`Are you sure you want to delete the student account for "${name}"?`)) return;
     try {
       await api.delete(`/admin/students/${id}`);
       fetchStudents();
     } catch (err) {
-      alert("Failed to delete student account.");
+      alert(err.response?.data?.message || "Failed to delete student account.");
     }
   }
 
@@ -142,14 +176,26 @@ export default function AdminDashboard() {
   }
 
   async function handleExport() {
-    const res = await api.get("/admin/students/export", { responseType: "blob" });
-    const url = window.URL.createObjectURL(new Blob([res.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "festival-of-independence-registrations.xlsx");
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    try {
+      const res = await api.get("/admin/students/export", {
+        params: {
+          search: search || undefined,
+          paymentStatus: paymentStatus || undefined,
+          college: selectedCollege || undefined,
+          date: selectedDate || undefined,
+        },
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "students-registrations.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      alert("Failed to export students list.");
+    }
   }
 
   async function handleSendNotification(e) {
@@ -257,6 +303,10 @@ export default function AdminDashboard() {
 
   async function handleAddAdmin(e) {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      alert("Only Super Admins can create new admin accounts.");
+      return;
+    }
     if (!adminForm.name || !adminForm.email || !adminForm.password) return;
     setAddingAdmin(true);
     setAdminFeedback("");
@@ -272,7 +322,59 @@ export default function AdminDashboard() {
     }
   }
 
+  function handleStartEditAdmin(adm) {
+    setEditingAdmin(adm);
+    setEditAdminForm({
+      name: adm.name || "",
+      email: adm.email || "",
+      role: adm.role || "VolunteerAdmin",
+      password: "",
+    });
+    setEditAdminFeedback("");
+  }
+
+  function handleCancelEditAdmin() {
+    setEditingAdmin(null);
+    setEditAdminFeedback("");
+  }
+
+  async function handleSaveEditAdmin(e) {
+    e.preventDefault();
+    if (!isSuperAdmin) {
+      alert("Only Super Admins can modify admin details.");
+      return;
+    }
+    if (!editAdminForm.name || !editAdminForm.email) return;
+    setSavingEditAdmin(true);
+    setEditAdminFeedback("");
+    try {
+      const payload = {
+        name: editAdminForm.name,
+        email: editAdminForm.email,
+        role: editAdminForm.role,
+      };
+      if (editAdminForm.password && editAdminForm.password.trim().length > 0) {
+        payload.password = editAdminForm.password;
+      }
+      await api.put(`/admin/team/${editingAdmin.id}`, payload);
+      setEditAdminFeedback("Admin details updated successfully!");
+      fetchAdminTeam();
+      setTimeout(() => {
+        setEditingAdmin(null);
+        setEditAdminFeedback("");
+      }, 1200);
+    } catch (err) {
+      setEditAdminFeedback(err.response?.data?.message || "Failed to update admin details.");
+    } finally {
+      setSavingEditAdmin(false);
+    }
+  }
+
   async function handleDeleteAdmin(id, name) {
+    if (!isSuperAdmin) {
+      alert("Only Super Admins can remove admin accounts.");
+      return;
+    }
     if (!confirm(`Remove admin account for "${name}"?`)) return;
     try {
       await api.delete(`/admin/team/${id}`);
@@ -448,31 +550,113 @@ export default function AdminDashboard() {
                   </button>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && fetchStudents()}
-                    placeholder="Search by name, email, or phone"
-                    className="flex-1 bg-gray-100/80 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-saffron transition-all border-0"
-                  />
-                  <select
-                    value={paymentStatus}
-                    onChange={(e) => setPaymentStatus(e.target.value)}
-                    className="bg-gray-100/80 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-saffron transition-all border-0"
-                  >
-                    <option value="">All Statuses</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                  </select>
-                  <button
-                    onClick={fetchStudents}
-                    className="bg-saffron text-navy text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-saffron/90 transition-all shadow-2xs"
-                  >
-                    Search
-                  </button>
+                {/* Search & Filter Controls Panel */}
+                <div className="bg-gray-50/90 p-4 rounded-2xl border border-gray-200/80 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    {/* 1. Search Input */}
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                        🔍 Search
+                      </label>
+                      <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && fetchStudents()}
+                        placeholder="Name, email, or phone"
+                        className="w-full bg-white rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
+                      />
+                    </div>
+
+                    {/* 2. College Filter Dropdown */}
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                        🏫 Filter by College
+                      </label>
+                      <select
+                        value={selectedCollege}
+                        onChange={(e) => setSelectedCollege(e.target.value)}
+                        className="w-full bg-white rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
+                      >
+                        <option value="">All Colleges</option>
+                        {[...colleges]
+                          .sort((a, b) => {
+                            const aName = (a.name || "").trim();
+                            const bName = (b.name || "").trim();
+                            const aOther = aName.toLowerCase().startsWith("other");
+                            const bOther = bName.toLowerCase().startsWith("other");
+                            if (aOther && !bOther) return 1;
+                            if (!aOther && bOther) return -1;
+                            return aName.localeCompare(bName, undefined, { sensitivity: "base" });
+                          })
+                          .map((c) => (
+                            <option key={c.id} value={c.name}>
+                              {c.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+
+                    {/* 3. Registration Date Filter */}
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                        📅 Filter by Date
+                      </label>
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="w-full bg-white rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
+                      />
+                    </div>
+
+                    {/* 4. Payment / Status Filter */}
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                        💳 Status
+                      </label>
+                      <select
+                        value={paymentStatus}
+                        onChange={(e) => setPaymentStatus(e.target.value)}
+                        className="w-full bg-white rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
+                      >
+                        <option value="">All Statuses</option>
+                        <option value="Paid">✓ Confirmed / Paid</option>
+                        <option value="Pending">⏳ Pending</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Filter Action Toolbar */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200/60">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[11px] font-extrabold text-navy">
+                        Found {students.length} student{students.length !== 1 ? "s" : ""}
+                      </span>
+                      {(search || selectedCollege || selectedDate || paymentStatus) && (
+                        <button
+                          onClick={() => {
+                            setSearch("");
+                            setSelectedCollege("");
+                            setSelectedDate("");
+                            setPaymentStatus("");
+                          }}
+                          className="text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg border border-red-200 transition-colors"
+                        >
+                          ✕ Clear Filters
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={fetchStudents}
+                      className="bg-saffron text-navy text-xs font-bold px-4 py-1.5 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-2xs"
+                    >
+                      Apply Filter
+                    </button>
+                  </div>
                 </div>
 
+                {/* Students Table */}
                 <div className="overflow-x-auto border border-gray-100 rounded-2xl shadow-2xs">
                   <table className="w-full text-xs sm:text-sm">
                     <thead className="bg-navy text-white font-bold">
@@ -481,22 +665,23 @@ export default function AdminDashboard() {
                         <th className="text-left px-4 py-3">Email</th>
                         <th className="text-left px-4 py-3">College</th>
                         <th className="text-left px-4 py-3">Phone</th>
+                        <th className="text-left px-4 py-3">Reg. Date</th>
                         <th className="text-left px-4 py-3">Status</th>
-                        <th className="text-right px-4 py-3">Action</th>
+                        {isSuperAdmin && <th className="text-right px-4 py-3">Action</th>}
                       </tr>
                     </thead>
                     <tbody>
                       {loadingStudents && (
                         <tr>
-                          <td colSpan={6} className="text-center py-6 text-gray-500">
+                          <td colSpan={isSuperAdmin ? 7 : 6} className="text-center py-6 text-gray-500">
                             Loading students...
                           </td>
                         </tr>
                       )}
                       {!loadingStudents && students.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="text-center py-6 text-gray-500">
-                            No student registrations found.
+                          <td colSpan={isSuperAdmin ? 7 : 6} className="text-center py-6 text-gray-500">
+                            No student registrations match the selected filters.
                           </td>
                         </tr>
                       )}
@@ -504,21 +689,26 @@ export default function AdminDashboard() {
                         <tr key={s.id} className={i % 2 === 1 ? "bg-gray-50/50" : "bg-white"}>
                           <td className="px-4 py-3 font-bold text-navy">{s.fullName}</td>
                           <td className="px-4 py-3 text-gray-700">{s.email}</td>
-                          <td className="px-4 py-3 text-gray-700">{s.College?.name || "—"}</td>
+                          <td className="px-4 py-3 text-gray-700 font-medium">{s.College?.name || "—"}</td>
                           <td className="px-4 py-3 text-gray-700">{s.phoneNumber}</td>
+                          <td className="px-4 py-3 text-gray-500 text-[11px] whitespace-nowrap">
+                            {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}
+                          </td>
                           <td className="px-4 py-3">
                             <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                               ✓ Confirmed (Free)
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-right">
-                            <button
-                              onClick={() => handleDeleteStudent(s.id, s.fullName)}
-                              className="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-xl border border-red-200 transition-colors"
-                            >
-                              Delete
-                            </button>
-                          </td>
+                          {isSuperAdmin && (
+                            <td className="px-4 py-3 text-right">
+                              <button
+                                onClick={() => handleDeleteStudent(s.id, s.fullName)}
+                                className="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-xl border border-red-200 transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -775,82 +965,233 @@ export default function AdminDashboard() {
             {/* TAB 5: ADMIN TEAM MANAGEMENT */}
             {activeTab === "team" && (
               <div className="space-y-6">
-                <div className="border-b border-gray-100 pb-3">
-                  <h2 className="text-xl font-extrabold tracking-tight text-navy">Admin Team Management</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Manage coordinator and volunteer administrator accounts.</p>
+                <div className="border-b border-gray-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-xl font-extrabold tracking-tight text-navy">Admin Team Management</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Manage coordinator and volunteer administrator accounts.</p>
+                  </div>
+                  {isSuperAdmin ? (
+                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full self-start sm:self-auto">
+                      ✓ Super Admin Access
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full self-start sm:self-auto">
+                      🔒 View Only Mode
+                    </span>
+                  )}
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-6">
-                  {/* Add Admin Form */}
-                  <div className="bg-gray-50/80 rounded-2xl p-5 border border-gray-100 space-y-3 text-xs sm:text-sm">
-                    <h3 className="text-sm font-extrabold text-navy">Add New Admin</h3>
-                    <form onSubmit={handleAddAdmin} className="space-y-3">
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Name *</label>
-                        <input
-                          value={adminForm.name}
-                          onChange={(e) => setAdminForm({ ...adminForm, name: e.target.value })}
-                          placeholder="Full Name"
-                          required
-                          className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Email *</label>
-                        <input
-                          type="email"
-                          value={adminForm.email}
-                          onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
-                          placeholder="admin@example.com"
-                          required
-                          className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Password *</label>
-                        <input
-                          type="password"
-                          value={adminForm.password}
-                          onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
-                          placeholder="Set Password"
-                          required
-                          className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200"
-                        />
-                      </div>
-                      {adminFeedback && (
-                        <p className={`text-xs font-bold ${adminFeedback.includes("successfully") ? "text-emerald-600" : "text-red-600"}`}>
-                          {adminFeedback}
-                        </p>
-                      )}
-                      <button
-                        type="submit"
-                        disabled={addingAdmin}
-                        className="w-full bg-saffron text-navy font-bold py-3 rounded-xl hover:bg-saffron/90 transition-all shadow-xs disabled:opacity-50"
-                      >
-                        {addingAdmin ? "Creating..." : "Create Admin Account"}
-                      </button>
-                    </form>
+                {!isSuperAdmin && (
+                  <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-4 flex items-start sm:items-center gap-3 text-xs text-amber-950 font-medium">
+                    <span className="text-xl">🛡️</span>
+                    <div>
+                      <p className="font-bold text-navy">Super Admin Permission Required</p>
+                      <p className="text-gray-600 mt-0.5">
+                        Only Super Admins have the authority to add new admins, edit admin credentials, or remove team members.
+                      </p>
+                    </div>
                   </div>
+                )}
+
+                <div className={isSuperAdmin ? "grid lg:grid-cols-2 gap-6" : "space-y-4"}>
+                  {/* Super Admin Action: Add or Edit Form */}
+                  {isSuperAdmin && (
+                    <div className="bg-gray-50/80 rounded-2xl p-5 border border-gray-100 space-y-4 text-xs sm:text-sm">
+                      {editingAdmin ? (
+                        // EDIT ADMIN FORM
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-sm font-extrabold text-navy">✏️ Edit Admin Details</h3>
+                            <button
+                              type="button"
+                              onClick={handleCancelEditAdmin}
+                              className="text-xs text-gray-500 hover:text-navy font-bold underline"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                          <form onSubmit={handleSaveEditAdmin} className="space-y-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                                Full Name *
+                              </label>
+                              <input
+                                value={editAdminForm.name}
+                                onChange={(e) => setEditAdminForm({ ...editAdminForm, name: e.target.value })}
+                                required
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                                Email Address *
+                              </label>
+                              <input
+                                type="email"
+                                value={editAdminForm.email}
+                                onChange={(e) => setEditAdminForm({ ...editAdminForm, email: e.target.value })}
+                                required
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                                Admin Role *
+                              </label>
+                              <select
+                                value={editAdminForm.role}
+                                onChange={(e) => setEditAdminForm({ ...editAdminForm, role: e.target.value })}
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              >
+                                <option value="VolunteerAdmin">VolunteerAdmin (Instant Password Login)</option>
+                                <option value="SuperAdmin">SuperAdmin (Full Permissions + 2FA OTP)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                                New Password (leave blank to keep current)
+                              </label>
+                              <input
+                                type="password"
+                                value={editAdminForm.password}
+                                onChange={(e) => setEditAdminForm({ ...editAdminForm, password: e.target.value })}
+                                placeholder="Enter new password to reset"
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              />
+                            </div>
+                            {editAdminFeedback && (
+                              <p className={`text-xs font-bold ${editAdminFeedback.includes("successfully") ? "text-emerald-600" : "text-red-600"}`}>
+                                {editAdminFeedback}
+                              </p>
+                            )}
+                            <div className="flex gap-2 pt-1">
+                              <button
+                                type="submit"
+                                disabled={savingEditAdmin}
+                                className="flex-1 bg-saffron text-navy font-bold py-2.5 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-xs disabled:opacity-50"
+                              >
+                                {savingEditAdmin ? "Saving..." : "Save Changes"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEditAdmin}
+                                className="px-4 bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-gray-300 transition-all"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      ) : (
+                        // ADD ADMIN FORM
+                        <div className="space-y-3">
+                          <h3 className="text-sm font-extrabold text-navy">➕ Add New Admin</h3>
+                          <form onSubmit={handleAddAdmin} className="space-y-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Name *</label>
+                              <input
+                                value={adminForm.name}
+                                onChange={(e) => setAdminForm({ ...adminForm, name: e.target.value })}
+                                placeholder="Full Name"
+                                required
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Email *</label>
+                              <input
+                                type="email"
+                                value={adminForm.email}
+                                onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                                placeholder="admin@example.com"
+                                required
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Role *</label>
+                              <select
+                                value={adminForm.role}
+                                onChange={(e) => setAdminForm({ ...adminForm, role: e.target.value })}
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              >
+                                <option value="VolunteerAdmin">VolunteerAdmin (Password Only)</option>
+                                <option value="SuperAdmin">SuperAdmin (Full Permissions + 2FA OTP)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Password *</label>
+                              <input
+                                type="password"
+                                value={adminForm.password}
+                                onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                                placeholder="Set Password"
+                                required
+                                className="w-full bg-white rounded-xl px-4 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
+                              />
+                            </div>
+                            {adminFeedback && (
+                              <p className={`text-xs font-bold ${adminFeedback.includes("successfully") ? "text-emerald-600" : "text-red-600"}`}>
+                                {adminFeedback}
+                              </p>
+                            )}
+                            <button
+                              type="submit"
+                              disabled={addingAdmin}
+                              className="w-full bg-saffron text-navy font-bold py-3 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-xs disabled:opacity-50"
+                            >
+                              {addingAdmin ? "Creating..." : "Create Admin Account"}
+                            </button>
+                          </form>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* List of Admin Accounts */}
-                  <div>
-                    <h3 className="text-sm font-extrabold text-navy mb-3">Admin Team ({adminTeam.length})</h3>
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-extrabold text-navy">Admin Team Directory ({adminTeam.length})</h3>
                     <div className="space-y-2.5">
                       {adminTeam.map((adm) => (
-                        <div key={adm.id} className="bg-gray-50/80 rounded-xl p-3.5 border border-gray-100 flex justify-between items-center text-xs">
+                        <div key={adm.id} className="bg-gray-50/90 rounded-2xl p-4 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                           <div>
-                            <h4 className="font-bold text-navy">{adm.name}</h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-bold text-navy text-sm">{adm.name}</h4>
+                              {adm.email === user?.email && (
+                                <span className="text-[10px] font-extrabold bg-blue-100 text-blue-800 px-2 py-0.2 rounded-full">
+                                  You
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[11px] text-gray-500">{adm.email}</p>
-                            <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-saffron bg-saffron/10 px-2 py-0.5 mt-1 rounded">
-                              {adm.role}
+                            <span className={`inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 mt-1.5 rounded-md ${
+                              adm.role === "SuperAdmin"
+                                ? "text-purple-700 bg-purple-100 border border-purple-200"
+                                : "text-saffron bg-saffron/10 border border-saffron/20"
+                            }`}>
+                              🛡️ {adm.role}
                             </span>
                           </div>
-                          <button
-                            onClick={() => handleDeleteAdmin(adm.id, adm.name)}
-                            className="text-xs font-bold text-red-600 hover:bg-red-50 px-2.5 py-1 rounded-lg border border-red-200"
-                          >
-                            Remove
-                          </button>
+
+                          {/* Super Admin Action Controls */}
+                          {isSuperAdmin && (
+                            <div className="flex items-center gap-2 self-end sm:self-center">
+                              <button
+                                onClick={() => handleStartEditAdmin(adm)}
+                                className="text-xs font-bold text-navy bg-white hover:bg-gray-100 px-3 py-1.5 rounded-xl border border-gray-200 transition-colors shadow-2xs"
+                              >
+                                ✏️ Edit
+                              </button>
+                              {adm.id !== user?.id && (
+                                <button
+                                  onClick={() => handleDeleteAdmin(adm.id, adm.name)}
+                                  className="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl border border-red-200 transition-colors"
+                                >
+                                  🗑️ Remove
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

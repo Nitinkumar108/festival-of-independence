@@ -171,7 +171,6 @@ function AdminLoginForm() {
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
-  const [devOtp, setDevOtp] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -190,15 +189,20 @@ function AdminLoginForm() {
     setSubmitting(true);
     try {
       const res = await api.post("/auth/admin/login", form);
+
+      if (rememberMe) {
+        localStorage.setItem("remembered_admin_email", form.email);
+      } else {
+        localStorage.removeItem("remembered_admin_email");
+      }
+
       if (res.data.requireOtp) {
-        if (rememberMe) {
-          localStorage.setItem("remembered_admin_email", form.email);
-        } else {
-          localStorage.removeItem("remembered_admin_email");
-        }
         setStep(2);
-        setInfoMessage(`Mandatory security OTP code sent to ${res.data.email}`);
-        if (res.data.devOtp) setDevOtp(res.data.devOtp);
+        setInfoMessage(`Super Admin security OTP code sent to ${res.data.email}`);
+      } else {
+        // Instant login for VolunteerAdmin
+        login({ token: res.data.token, role: "admin", user: res.data.admin });
+        navigate("/admin/dashboard");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Admin login failed.");
@@ -228,11 +232,6 @@ function AdminLoginForm() {
         <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center space-y-1">
           <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">🔒 Mandatory 2FA Security</p>
           <p className="text-xs text-gray-700 font-medium">{infoMessage}</p>
-          {devOtp && (
-            <p className="text-xs font-mono font-bold text-saffron pt-1">
-              [DEV OTP]: <span className="underline">{devOtp}</span>
-            </p>
-          )}
         </div>
 
         <div>

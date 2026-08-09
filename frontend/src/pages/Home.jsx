@@ -23,9 +23,9 @@ const heroImages = [
     alt: "Somnath Temple, Gujarat"
   },
   {
-    url: "/slideshow/south_indian_temple.png",
-    name: "South Indian Temple",
-    alt: "South Indian Temple Architecture"
+    url: "/slideshow/tirupati_balaji.png",
+    name: "Tirupati Balaji Temple",
+    alt: "Sri Venkateswara Swamy Temple (Tirupati Balaji), Tirumala"
   },
   {
     url: "/slideshow/taj_mahal.png",
@@ -37,6 +37,39 @@ const heroImages = [
     name: "Lotus Temple of Delhi",
     alt: "Lotus Temple, Delhi"
   }
+];
+
+const nashaMuktPosters = [
+  {
+    url: "/nasha_mukt/nasha_mukt_1.jpg",
+    title: "नशे से दूरी, सुनहरे कल के लिए है जरूरी",
+    subtitle: "Viksit Bharat @2047",
+    tag: "संकल्प अभियान",
+  },
+  {
+    url: "/nasha_mukt/nasha_mukt_2.png",
+    title: "Say NO to Drugs, YES to Life",
+    subtitle: "Pledge for a Drug-Free Future",
+    tag: "Take the Pledge",
+  },
+  {
+    url: "/nasha_mukt/nasha_mukt_3.png",
+    title: "Choose a Brighter Tomorrow",
+    subtitle: "Say NO to Drugs Today",
+    tag: "Youth Leadership",
+  },
+  {
+    url: "/nasha_mukt/nasha_mukt_4.jpg",
+    title: "Drugs Destroy Lives",
+    subtitle: "Together for a Drug-Free India",
+    tag: "Awareness",
+  },
+  {
+    url: "/nasha_mukt/nasha_mukt_5.png",
+    title: "नशे को ना, जिंदगी को हाँ",
+    subtitle: "आज का संकल्प, बनाएगा भविष्य उज्ज्वल",
+    tag: "नशा मुक्त भारत",
+  },
 ];
 
 const journeyMilestones = [
@@ -220,6 +253,7 @@ function AnimatedTimelineItem({ item, isEven }) {
 export default function Home() {
   const { user, token, role } = useAuth();
   const [heroIndex, setHeroIndex] = useState(0);
+  const [selectedPoster, setSelectedPoster] = useState(null);
 
   // UG Notice State (Persisted in localStorage so it never pops up again once closed)
   const [isUgNoticeDismissed, setIsUgNoticeDismissed] = useState(() => {
@@ -407,6 +441,53 @@ export default function Home() {
             </p>
           </div>
 
+          {/* 5 Horizontal Campaign Poster Cards */}
+          <div className="pt-1">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <span className="text-[11px] sm:text-xs font-extrabold tracking-wider uppercase text-saffron flex items-center gap-1.5">
+                <span>🇮🇳</span> Gen-Z Against Addiction • Campaign Posters
+              </span>
+              <span className="text-[10px] font-bold text-gray-500 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/80">
+                Click to expand 🔍
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
+              {nashaMuktPosters.map((poster, index) => (
+                <div
+                  key={index}
+                  onClick={() => setSelectedPoster(poster)}
+                  className="group bg-white rounded-2xl p-2 sm:p-2.5 border border-amber-200/80 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                >
+                  <div className="relative rounded-xl overflow-hidden aspect-[3/4] bg-amber-50/50 mb-2 border border-gray-100 shadow-2xs">
+                    <img
+                      src={poster.url}
+                      alt={poster.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                      <span className="text-[10px] font-extrabold text-white bg-saffron/95 px-2.5 py-0.5 rounded-full shadow-xs">
+                        View Poster 🔍
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-left space-y-0.5">
+                    <span className="inline-block text-[9px] font-extrabold text-saffron uppercase tracking-wider bg-saffron/10 px-1.5 py-0.5 rounded">
+                      {poster.tag}
+                    </span>
+                    <h4 className="text-[11px] font-bold text-navy line-clamp-1 group-hover:text-saffron transition-colors">
+                      {poster.title}
+                    </h4>
+                    <p className="text-[10px] text-gray-500 line-clamp-1">
+                      {poster.subtitle}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Card 3: 4 Core Pillars */}
           <div className="bg-white rounded-xl shadow-sm border border-emerald-100 border-t-4 border-t-indiagreen p-4 sm:p-6 text-center">
             <h3 className="text-xs sm:text-sm font-bold text-navy uppercase tracking-wider mb-4">
@@ -542,6 +623,45 @@ export default function Home() {
           >
             ✕
           </button>
+        </div>
+      )}
+
+      {/* Poster Lightbox / Modal */}
+      {selectedPoster && (
+        <div
+          className="fixed inset-0 z-50 bg-navy/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setSelectedPoster(null)}
+        >
+          <div
+            className="bg-white rounded-3xl p-4 sm:p-6 max-w-md w-full shadow-2xl relative animate-in zoom-in-95 duration-200 border border-gray-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedPoster(null)}
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-600 font-bold text-sm flex items-center justify-center transition-colors shadow-xs"
+              aria-label="Close Preview"
+            >
+              ✕
+            </button>
+            <div className="rounded-2xl overflow-hidden border border-gray-200 mb-3 bg-gray-50 flex items-center justify-center shadow-inner">
+              <img
+                src={selectedPoster.url}
+                alt={selectedPoster.title}
+                className="w-full max-h-[68vh] object-contain"
+              />
+            </div>
+            <div className="text-center space-y-1">
+              <span className="text-[11px] font-extrabold text-saffron uppercase tracking-wide bg-saffron/10 px-2.5 py-0.5 rounded-full border border-saffron/30">
+                {selectedPoster.tag}
+              </span>
+              <h3 className="text-sm sm:text-base font-extrabold text-navy">
+                {selectedPoster.title}
+              </h3>
+              <p className="text-xs text-gray-600 font-medium">
+                {selectedPoster.subtitle}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

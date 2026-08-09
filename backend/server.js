@@ -50,8 +50,11 @@ const authLimiter = rateLimit({
 });
 app.use("/api/auth", authLimiter);
 
-// ----- Routes -----
-app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+// ----- Health & Keep-Alive Ping Endpoints for Cron Jobs -----
+app.get("/", (req, res) => res.status(200).send("Festival of Independence API Server is Live 🚀"));
+app.get("/health", (req, res) => res.status(200).json({ status: "ok", timestamp: new Date().toISOString() }));
+app.get("/api/health", (req, res) => res.status(200).json({ status: "ok", timestamp: new Date().toISOString() }));
+app.get("/api/ping", (req, res) => res.status(200).json({ message: "pong" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
@@ -70,8 +73,7 @@ async function start() {
   try {
     await sequelize.authenticate();
     console.log("Database connected successfully.");
-    // In production, prefer migrations. { alter: true } is convenient for early development only.
-    await sequelize.sync({ alter: process.env.NODE_ENV !== "production" });
+    await sequelize.sync();
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error("Failed to start server:", err);

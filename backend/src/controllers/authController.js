@@ -162,44 +162,58 @@ async function loginAdmin(req, res, next) {
     const isMatch = await bcrypt.compare(password, admin.passwordHash);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials." });
 
-    // MANDATORY OTP GENERATION FOR ALL ADMIN LOGINS
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+    // ONLY SuperAdmin REQUIRES MANDATORY 2FA OTP VERIFICATION
+    if (admin.role === "SuperAdmin") {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    await OtpVerification.destroy({ where: { target: email, type: "email" } });
-    await OtpVerification.create({
-      target: email,
-      code,
-      type: "email",
-      expiresAt,
-      isVerified: false,
-    });
+      await OtpVerification.destroy({ where: { target: email, type: "email" } });
+      await OtpVerification.create({
+        target: email,
+        code,
+        type: "email",
+        expiresAt,
+        isVerified: false,
+      });
 
-    // Send mandatory OTP to Admin email
-    await sendEmail({
-      to: email,
-      subject: "🔒 Admin Security Verification OTP - Festival of Independence",
-      text: `Your Admin Login Security OTP is: ${code}. It expires in 10 minutes.`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 12px; background: #fff;">
-          <h2 style="color: #1E293B; margin-bottom: 5px;">Festival of Independence Admin Portal</h2>
-          <p style="color: #64748B; font-size: 14px;">Mandatory 2FA Security Verification</p>
-          <div style="background: #FFF7ED; padding: 15px; border-radius: 8px; border: 1px solid #FDBA74; text-align: center; margin: 20px 0;">
-            <p style="font-size: 12px; color: #9A3412; font-weight: bold; margin: 0 0 5px 0;">YOUR 6-DIGIT VERIFICATION CODE</p>
-            <div style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #EA580C;">${code}</div>
+      // Send mandatory OTP to SuperAdmin email
+      await sendEmail({
+        to: email,
+        subject: "🔒 Super Admin Security Verification OTP - Festival of Independence",
+        text: `Your Super Admin Login Security OTP is: ${code}. It expires in 10 minutes.`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 12px; background: #fff;">
+            <h2 style="color: #1E293B; margin-bottom: 5px;">Festival of Independence Admin Portal</h2>
+            <p style="color: #64748B; font-size: 14px;">Super Admin 2FA Security Verification</p>
+            <div style="background: #FFF7ED; padding: 15px; border-radius: 8px; border: 1px solid #FDBA74; text-align: center; margin: 20px 0;">
+              <p style="font-size: 12px; color: #9A3412; font-weight: bold; margin: 0 0 5px 0;">YOUR 6-DIGIT VERIFICATION CODE</p>
+              <div style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #EA580C;">${code}</div>
+            </div>
+            <p style="font-size: 13px; color: #64748B;">This code is valid for 10 minutes. Do not share this OTP with anyone.</p>
           </div>
-          <p style="font-size: 13px; color: #64748B;">This code is valid for 10 minutes. Do not share this OTP with anyone.</p>
-        </div>
-      `,
-    });
+        `,
+      });
 
-    console.log(`🔒 [ADMIN LOGIN OTP DISPATCHED] Email: ${email} | Code: ${code}`);
+      console.log(`🔒 [SUPER ADMIN LOGIN OTP DISPATCHED] Email: ${email} | Code: ${code}`);
 
-    res.json({
-      requireOtp: true,
-      email,
-      message: `Mandatory security OTP sent to ${email}.`,
-      devOtp: process.env.NODE_ENV !== "production" ? code : undefined,
+      return res.json({
+        requireOtp: true,
+        email,
+        message: `Mandatory security OTP sent to ${email}.`,
+      });
+    }
+
+    // Regular Admins (VolunteerAdmin) log in instantly without OTP
+    const token = generateToken({ id: admin.id, role: "admin", adminRole: admin.role });
+    return res.json({
+      requireOtp: false,
+      token,
+      admin: {
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+      },
     });
   } catch (err) {
     next(err);
@@ -233,7 +247,7 @@ async function verifyAdminOtp(req, res, next) {
     record.isVerified = true;
     await record.save();
 
-    const token = generateToken({ id: admin.id, role: "admin" });
+    const token = generateToken({ id: admin.id, role: "admin", adminRole: admin.role });
     res.json({
       token,
       admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role },

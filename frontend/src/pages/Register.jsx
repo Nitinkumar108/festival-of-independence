@@ -231,14 +231,21 @@ export default function Register() {
               className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs sm:text-sm font-medium text-navy focus:outline-none focus:border-saffron"
             >
               <option value="">-- Select College / Institution --</option>
-              {(colleges.length > 0
-                ? colleges
-                : DEFAULT_COLLEGES_LIST.map((name) => ({ id: name, name }))
-              ).map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              {[...(colleges.length > 0 ? colleges : DEFAULT_COLLEGES_LIST.map((name) => ({ id: name, name })))]
+                .sort((a, b) => {
+                  const aName = (a.name || "").trim();
+                  const bName = (b.name || "").trim();
+                  const aOther = aName.toLowerCase().startsWith("other");
+                  const bOther = bName.toLowerCase().startsWith("other");
+                  if (aOther && !bOther) return 1;
+                  if (!aOther && bOther) return -1;
+                  return aName.localeCompare(bName, undefined, { sensitivity: "base" });
+                })
+                .map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
             </select>
           </div>
 

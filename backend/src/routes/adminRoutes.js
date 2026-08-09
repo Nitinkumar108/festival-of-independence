@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { protect, requireRole } = require("../middleware/authMiddleware");
+const { protect, requireRole, requireSuperAdmin } = require("../middleware/authMiddleware");
 const {
   listStudents,
   deleteStudent,
@@ -11,13 +11,14 @@ const {
   deleteNotification,
   listAdmins,
   createAdmin,
+  updateAdmin,
   deleteAdmin,
 } = require("../controllers/adminController");
 
 router.use(protect, requireRole("admin"));
 
 router.get("/students", listStudents);
-router.delete("/students/:id", deleteStudent);
+router.delete("/students/:id", requireSuperAdmin, deleteStudent);
 router.get("/students/export", exportStudents);
 router.get("/payments", listPayments);
 
@@ -26,7 +27,8 @@ router.post("/notifications", createNotification);
 router.delete("/notifications/:id", deleteNotification);
 
 router.get("/team", listAdmins);
-router.post("/team", createAdmin);
-router.delete("/team/:id", deleteAdmin);
+router.post("/team", requireSuperAdmin, createAdmin);
+router.put("/team/:id", requireSuperAdmin, updateAdmin);
+router.delete("/team/:id", requireSuperAdmin, deleteAdmin);
 
 module.exports = router;

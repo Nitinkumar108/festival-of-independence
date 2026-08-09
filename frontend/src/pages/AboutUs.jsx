@@ -64,7 +64,7 @@ export default function AboutUs() {
                   📖 Aligned with NEP 2020
                 </span>
                 <span className="bg-white/10 text-emerald-400 px-3.5 py-1.5 rounded-xl border border-emerald-400/30 backdrop-blur-md shadow-xs">
-                  🌳 Indian Knowledge Systems
+                  🌳 Aligned with Indian Knowledge System
                 </span>
               </div>
             </div>
@@ -97,33 +97,33 @@ export default function AboutUs() {
           
           <div className="h-44 sm:h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-amber-50 group hover:scale-105 transition-transform duration-300">
             <img
-              src="/about/youth_seminar.png"
-              alt="Youth Seminar"
-              className="w-full h-full object-cover"
+              src="/about/about_front_1.jpg"
+              alt="IYF College Seminar & Classroom Session"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
 
           <div className="h-44 sm:h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-blue-50 group hover:scale-105 transition-transform duration-300">
             <img
-              src="/about/student_collaboration.png"
-              alt="Student Collaboration"
-              className="w-full h-full object-cover"
+              src="/about/about_front_2.jpg"
+              alt="Youth Spiritual & Cultural Heritage Retreat"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
 
           <div className="h-44 sm:h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-amber-50 group hover:scale-105 transition-transform duration-300">
             <img
-              src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
-              alt="Campus Discussion"
-              className="w-full h-full object-cover"
+              src="/about/about_front_3.jpg"
+              alt="Students at Srila Prabhupada Pavilion"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
 
           <div className="h-44 sm:h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-blue-50 group hover:scale-105 transition-transform duration-300">
             <img
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80"
-              alt="Youth Gathering"
-              className="w-full h-full object-cover"
+              src="/about/about_front_4.jpg"
+              alt="Youth Convention & Festival Gathering"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
 
@@ -278,7 +278,7 @@ export default function AboutUs() {
                 </div>
                 <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
                   <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
-                  <span>Spiritual Hub of Bengal</span>
+                  <span>One of the Spiritual Centres of Kolkata</span>
                 </div>
               </div>
             </div>
@@ -366,7 +366,7 @@ export default function AboutUs() {
                 </div>
                 <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
                   <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>
-                  <span>Indian Knowledge Systems</span>
+                  <span>Aligned with Indian Knowledge System</span>
                 </div>
                 <div className="flex items-center gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
                   <span className="w-5 h-5 rounded-full bg-saffron text-navy flex items-center justify-center text-xs font-black">✓</span>

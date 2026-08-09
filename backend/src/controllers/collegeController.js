@@ -65,11 +65,11 @@ const DEFAULT_COLLEGES = [
 /** GET /api/colleges — public, powers the registration dropdown */
 async function listColleges(req, res, next) {
   try {
-    // Seed any missing default colleges
-    for (const name of DEFAULT_COLLEGES) {
-      await College.findOrCreate({ where: { name } });
+    let colleges = await College.findAll({ order: [["name", "ASC"]] });
+    if (colleges.length === 0) {
+      await College.bulkCreate(DEFAULT_COLLEGES.map((name) => ({ name })), { ignoreDuplicates: true });
+      colleges = await College.findAll({ order: [["name", "ASC"]] });
     }
-    const colleges = await College.findAll({ order: [["name", "ASC"]] });
     res.json(colleges);
   } catch (err) {
     next(err);

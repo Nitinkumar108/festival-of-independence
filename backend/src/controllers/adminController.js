@@ -2,10 +2,10 @@ const bcrypt = require("bcryptjs");
 const { Student, Admin, College, Payment, Notification, EventRegistration } = require("../models");
 const exportToExcel = require("../utils/excelExport");
 
-/** GET /api/admin/students?college=&paymentStatus=&search= */
+/** GET /api/admin/students?college=&paymentStatus=&search=&date=&startDate=&endDate= */
 async function listStudents(req, res, next) {
   try {
-    const { college, paymentStatus, search } = req.query;
+    const { college, paymentStatus, search, date, startDate, endDate } = req.query;
     const { Op } = require("sequelize");
     const where = {};
 
@@ -18,6 +18,26 @@ async function listStudents(req, res, next) {
       ];
     }
 
+    if (date) {
+      const startOfDay = new Date(`${date}T00:00:00.000Z`);
+      const endOfDay = new Date(`${date}T23:59:59.999Z`);
+      where.createdAt = { [Op.between]: [startOfDay, endOfDay] };
+    } else if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) where.createdAt[Op.gte] = new Date(`${startDate}T00:00:00.000Z`);
+      if (endDate) where.createdAt[Op.lte] = new Date(`${endDate}T23:59:59.999Z`);
+    }
+
+    const collegeWhere = {};
+    if (college) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(college);
+      if (isUuid) {
+        collegeWhere[Op.or] = [{ id: college }, { name: college }];
+      } else {
+        collegeWhere.name = college;
+      }
+    }
+
     const students = await Student.findAll({
       where,
       attributes: { exclude: ["passwordHash"] },
@@ -25,7 +45,7 @@ async function listStudents(req, res, next) {
         {
           model: College,
           attributes: ["id", "name"],
-          where: college ? { name: college } : undefined,
+          where: college ? collegeWhere : undefined,
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -40,6 +60,10 @@ async function listStudents(req, res, next) {
 /** DELETE /api/admin/students/:id — delete registered student account */
 async function deleteStudent(req, res, next) {
   try {
+    if (req.user.adminRole !== "SuperAdmin") {
+      return res.status(403).json({ message: "Only Super Admins can delete student registrations." });
+    }
+
     const studentId = req.params.id;
     const student = await Student.findByPk(studentId);
     if (!student) return res.status(404).json({ message: "Student account not found." });
@@ -57,26 +81,68 @@ async function deleteStudent(req, res, next) {
 /** GET /api/admin/students/export — download filtered list as Excel */
 async function exportStudents(req, res, next) {
   try {
+    const { college, paymentStatus, search, date, startDate, endDate } = req.query;
+    const { Op } = require("sequelize");
+    const where = {};
+
+    if (paymentStatus) where.paymentStatus = paymentStatus;
+    if (search) {
+      where[Op.or] = [
+        { fullName: { [Op.iLike]: `%${search}%` } },
+        { email: { [Op.iLike]: `%${search}%` } },
+        { phoneNumber: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
+    if (date) {
+      const startOfDay = new Date(`${date}T00:00:00.000Z`);
+      const endOfDay = new Date(`${date}T23:59:59.999Z`);
+      where.createdAt = { [Op.between]: [startOfDay, endOfDay] };
+    } else if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) where.createdAt[Op.gte] = new Date(`${startDate}T00:00:00.000Z`);
+      if (endDate) where.createdAt[Op.lte] = new Date(`${endDate}T23:59:59.999Z`);
+    }
+
+    const collegeWhere = {};
+    if (college) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(college);
+      if (isUuid) {
+        collegeWhere[Op.or] = [{ id: college }, { name: college }];
+      } else {
+        collegeWhere.name = college;
+      }
+    }
+
     const students = await Student.findAll({
-      attributes: { exclude: ["passwordHash"] },
-      include: [{ model: College, attributes: ["name"] }],
+      where,
+      attributes: ["id", "fullName", "email", "phoneNumber", "paymentStatus", "createdAt"],
+      include: [
+        {
+          model: College,
+          attributes: ["id", "name"],
+          where: college ? collegeWhere : undefined,
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
     const rows = students.map((s) => ({
+      id: s.id,
       fullName: s.fullName,
       email: s.email,
       phoneNumber: s.phoneNumber,
-      college: s.College ? s.College.name : "",
+      college: s.College?.name || "N/A",
       paymentStatus: s.paymentStatus,
-      registeredOn: s.createdAt.toISOString().slice(0, 10),
+      registeredOn: new Date(s.createdAt).toLocaleDateString(),
     }));
 
     await exportToExcel(res, {
-      sheetName: "Registrations",
-      fileName: "festival-of-independence-registrations.xlsx",
+      filename: "students.xlsx",
+      sheetName: "Students",
       columns: [
-        { header: "Full Name", key: "fullName", width: 25 },
+        { header: "ID", key: "id", width: 36 },
+        { header: "Full Name", key: "fullName", width: 24 },
         { header: "Email", key: "email", width: 28 },
         { header: "Phone", key: "phoneNumber", width: 16 },
         { header: "College", key: "college", width: 28 },
@@ -152,9 +218,13 @@ async function listAdmins(req, res, next) {
   }
 }
 
-/** POST /api/admin/team — add new admin account */
+/** POST /api/admin/team — add new admin account (SuperAdmin only) */
 async function createAdmin(req, res, next) {
   try {
+    if (req.user.adminRole !== "SuperAdmin") {
+      return res.status(403).json({ message: "Only Super Admins can create new admin accounts." });
+    }
+
     const { name, email, password, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, and password are required." });
@@ -184,9 +254,60 @@ async function createAdmin(req, res, next) {
   }
 }
 
-/** DELETE /api/admin/team/:id — delete admin account */
+/** PUT /api/admin/team/:id — update admin details (SuperAdmin only) */
+async function updateAdmin(req, res, next) {
+  try {
+    if (req.user.adminRole !== "SuperAdmin") {
+      return res.status(403).json({ message: "Only Super Admins can update admin details." });
+    }
+
+    const admin = await Admin.findByPk(req.params.id);
+    if (!admin) return res.status(404).json({ message: "Admin account not found." });
+
+    const { name, email, role, password } = req.body;
+
+    if (name) admin.name = name;
+    if (email && email !== admin.email) {
+      const existing = await Admin.findOne({ where: { email } });
+      if (existing) {
+        return res.status(409).json({ message: "Another admin already uses this email." });
+      }
+      admin.email = email;
+    }
+    if (role && ["SuperAdmin", "VolunteerAdmin"].includes(role)) {
+      if (admin.role === "SuperAdmin" && role !== "SuperAdmin") {
+        const superAdminCount = await Admin.count({ where: { role: "SuperAdmin" } });
+        if (superAdminCount <= 1) {
+          return res.status(400).json({ message: "Cannot demote the only remaining Super Admin." });
+        }
+      }
+      admin.role = role;
+    }
+    if (password && password.trim().length > 0) {
+      admin.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    await admin.save();
+
+    res.json({
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      role: admin.role,
+      message: "Admin details updated successfully.",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/** DELETE /api/admin/team/:id — delete admin account (SuperAdmin only) */
 async function deleteAdmin(req, res, next) {
   try {
+    if (req.user.adminRole !== "SuperAdmin") {
+      return res.status(403).json({ message: "Only Super Admins can delete admin accounts." });
+    }
+
     const admin = await Admin.findByPk(req.params.id);
     if (!admin) return res.status(404).json({ message: "Admin not found." });
 
@@ -211,5 +332,6 @@ module.exports = {
   deleteNotification,
   listAdmins,
   createAdmin,
+  updateAdmin,
   deleteAdmin,
 };

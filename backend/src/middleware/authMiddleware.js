@@ -41,4 +41,12 @@ function requireRole(role) {
   };
 }
 
-module.exports = { protect, optionalAuth, requireRole };
+/** Restricts a route strictly to Super Admin */
+function requireSuperAdmin(req, res, next) {
+  if (!req.user || req.user.role !== "admin" || req.user.adminRole !== "SuperAdmin") {
+    return res.status(403).json({ message: "Forbidden: Super Admin access required." });
+  }
+  next();
+}
+
+module.exports = { protect, optionalAuth, requireRole, requireSuperAdmin };
