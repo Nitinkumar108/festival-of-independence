@@ -106,7 +106,7 @@ export default function AboutUs() {
           <div className="h-44 sm:h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-blue-50 group hover:scale-105 transition-transform duration-300">
             <img
               src="/about/about_front_2.jpg"
-              alt="Youth Spiritual & Cultural Heritage Retreat"
+              alt="Youth Cultural Drama & Stage Performance"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
@@ -114,7 +114,7 @@ export default function AboutUs() {
           <div className="h-44 sm:h-56 rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-amber-50 group hover:scale-105 transition-transform duration-300">
             <img
               src="/about/about_front_3.jpg"
-              alt="Students at Srila Prabhupada Pavilion"
+              alt="Sanctified Prasadam & Community Feasting"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
@@ -315,8 +315,8 @@ export default function AboutUs() {
             <div className="lg:col-span-6 relative">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-100 bg-amber-50 group">
                 <img
-                  src="/about/iyf_learning.png"
-                  alt="ISKCON Youth Forum Seminar Learning"
+                  src="/about/iyf_forum.jpg"
+                  alt="ISKCON Youth Forum Youth Gathering"
                   className="w-full h-[320px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>

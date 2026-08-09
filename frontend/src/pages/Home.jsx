@@ -52,24 +52,6 @@ const nashaMuktPosters = [
     subtitle: "Pledge for a Drug-Free Future",
     tag: "Take the Pledge",
   },
-  {
-    url: "/nasha_mukt/nasha_mukt_3.png",
-    title: "Choose a Brighter Tomorrow",
-    subtitle: "Say NO to Drugs Today",
-    tag: "Youth Leadership",
-  },
-  {
-    url: "/nasha_mukt/nasha_mukt_4.jpg",
-    title: "Drugs Destroy Lives",
-    subtitle: "Together for a Drug-Free India",
-    tag: "Awareness",
-  },
-  {
-    url: "/nasha_mukt/nasha_mukt_5.png",
-    title: "नशे को ना, जिंदगी को हाँ",
-    subtitle: "आज का संकल्प, बनाएगा भविष्य उज्ज्वल",
-    tag: "नशा मुक्त भारत",
-  },
 ];
 
 const journeyMilestones = [
@@ -441,8 +423,8 @@ export default function Home() {
             </p>
           </div>
 
-          {/* 5 Horizontal Campaign Poster Cards */}
-          <div className="pt-1">
+          {/* 2 Campaign Poster Cards Centered */}
+          <div className="pt-1 max-w-xl mx-auto">
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-[11px] sm:text-xs font-extrabold tracking-wider uppercase text-saffron flex items-center gap-1.5">
                 <span>🇮🇳</span> Gen-Z Against Addiction • Campaign Posters
@@ -452,22 +434,22 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 justify-center">
               {nashaMuktPosters.map((poster, index) => (
                 <div
                   key={index}
                   onClick={() => setSelectedPoster(poster)}
-                  className="group bg-white rounded-2xl p-2 sm:p-2.5 border border-amber-200/80 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="group bg-white rounded-2xl p-2.5 sm:p-3 border border-amber-200/80 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
                 >
-                  <div className="relative rounded-xl overflow-hidden aspect-[3/4] bg-amber-50/50 mb-2 border border-gray-100 shadow-2xs">
+                  <div className="relative rounded-xl overflow-hidden aspect-[3/4] bg-amber-50/50 mb-2.5 border border-gray-100 shadow-2xs">
                     <img
                       src={poster.url}
                       alt={poster.title}
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
-                      <span className="text-[10px] font-extrabold text-white bg-saffron/95 px-2.5 py-0.5 rounded-full shadow-xs">
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2.5">
+                      <span className="text-[10px] font-extrabold text-white bg-saffron/95 px-3 py-1 rounded-full shadow-xs">
                         View Poster 🔍
                       </span>
                     </div>
@@ -476,10 +458,10 @@ export default function Home() {
                     <span className="inline-block text-[9px] font-extrabold text-saffron uppercase tracking-wider bg-saffron/10 px-1.5 py-0.5 rounded">
                       {poster.tag}
                     </span>
-                    <h4 className="text-[11px] font-bold text-navy line-clamp-1 group-hover:text-saffron transition-colors">
+                    <h4 className="text-xs sm:text-sm font-bold text-navy line-clamp-1 group-hover:text-saffron transition-colors">
                       {poster.title}
                     </h4>
-                    <p className="text-[10px] text-gray-500 line-clamp-1">
+                    <p className="text-[11px] text-gray-500 line-clamp-1">
                       {poster.subtitle}
                     </p>
                   </div>
