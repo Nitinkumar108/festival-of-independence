@@ -10,6 +10,7 @@ const Student = sequelize.define(
       primaryKey: true,
     },
     fullName: { type: DataTypes.STRING, allowNull: false },
+    gender: { type: DataTypes.STRING, allowNull: true },
     phoneNumber: { type: DataTypes.STRING, allowNull: false },
     address: { type: DataTypes.TEXT, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, validate: { isEmail: true } },

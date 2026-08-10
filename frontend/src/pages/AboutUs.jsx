@@ -454,9 +454,8 @@ export default function AboutUs() {
                   🧠
                 </div>
                 <div>
-                  <span className="text-xs font-black text-amber-900 bg-yellow-200/80 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Poster 3 Insight</span>
-                  <h3 className="text-xl sm:text-3xl font-black text-navy mt-1">1. Independence of SELF</h3>
-                  <p className="text-xs sm:text-sm text-amber-950 font-medium">Knowing the truth: "I am not the body; I am a spirit soul."</p>
+                  <h3 className="text-xl sm:text-3xl font-black text-navy">1. Independence of SELF</h3>
+                  <p className="text-xs sm:text-sm text-amber-950 font-medium mt-0.5">Knowing the truth: "I am not the body; I am a spirit soul."</p>
                 </div>
               </div>
 
@@ -503,9 +502,8 @@ export default function AboutUs() {
                   💡
                 </div>
                 <div>
-                  <span className="text-xs font-extrabold text-blue-700 uppercase tracking-wider">Poster 4 Insight</span>
-                  <h3 className="text-xl sm:text-3xl font-extrabold text-navy mt-0.5">2. Independence of THOUGHT</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">Choose Clarity over Confusion • Choose Truth over Trends</p>
+                  <h3 className="text-xl sm:text-3xl font-extrabold text-navy">2. Independence of THOUGHT</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium mt-0.5">Choose Clarity over Confusion • Choose Truth over Trends</p>
                 </div>
               </div>
 
@@ -545,9 +543,8 @@ export default function AboutUs() {
                   🌱
                 </div>
                 <div>
-                  <span className="text-xs font-extrabold text-indiagreen uppercase tracking-wider">Poster 5 Insight</span>
-                  <h3 className="text-xl sm:text-3xl font-extrabold text-navy mt-0.5">3. Independence of CULTURE</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">Where imitation ends, true identity begins</p>
+                  <h3 className="text-xl sm:text-3xl font-extrabold text-navy">3. Independence of CULTURE</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium mt-0.5">Where imitation ends, true identity begins</p>
                 </div>
               </div>
 

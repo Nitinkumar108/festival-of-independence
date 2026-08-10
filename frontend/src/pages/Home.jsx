@@ -212,20 +212,9 @@ function AnimatedTimelineItem({ item, isEven }) {
             <p className="text-xs font-semibold text-indiagreen mb-1.5">
               {item.subtitle}
             </p>
-            <p className="text-gray-600 text-xs leading-relaxed mb-2.5">
+            <p className="text-gray-600 text-xs leading-relaxed">
               {item.description}
             </p>
-
-            <div className="flex flex-wrap gap-1">
-              {item.tags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="text-[9px] font-medium text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-100"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
           </div>
         </div>
       </div>

@@ -240,21 +240,9 @@ export default function UpcomingEvents() {
                       </p>
 
                       {/* Description */}
-                      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-4">
+                      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
                         {item.description}
                       </p>
-
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-1.5">
-                        {item.tags.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="text-[11px] font-medium text-gray-600 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
 
                     </div>
                   </div>

@@ -116,7 +116,7 @@ async function exportStudents(req, res, next) {
 
     const students = await Student.findAll({
       where,
-      attributes: ["id", "fullName", "email", "phoneNumber", "paymentStatus", "createdAt"],
+      attributes: ["id", "fullName", "gender", "email", "phoneNumber", "paymentStatus", "createdAt"],
       include: [
         {
           model: College,
@@ -130,6 +130,7 @@ async function exportStudents(req, res, next) {
     const rows = students.map((s) => ({
       id: s.id,
       fullName: s.fullName,
+      gender: s.gender || "—",
       email: s.email,
       phoneNumber: s.phoneNumber,
       college: s.College?.name || "N/A",
@@ -143,6 +144,7 @@ async function exportStudents(req, res, next) {
       columns: [
         { header: "ID", key: "id", width: 36 },
         { header: "Full Name", key: "fullName", width: 24 },
+        { header: "Gender", key: "gender", width: 14 },
         { header: "Email", key: "email", width: 28 },
         { header: "Phone", key: "phoneNumber", width: 16 },
         { header: "College", key: "college", width: 28 },

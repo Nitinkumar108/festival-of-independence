@@ -42,6 +42,8 @@ const DEFAULT_COLLEGES = [
   "New Alipore College",
   "Shibpur Dinobundhoo Institution (College)",
   "Dr. Kanailal Bhattacharyya College",
+  "THK Jain College",
+  "Heritage Law College",
 
   // Medical Colleges
   "Calcutta Medical College",
@@ -50,7 +52,9 @@ const DEFAULT_COLLEGES = [
   "R.G. Kar Medical College and Hospital",
   "Calcutta National Medical College and Hospital (CNMC)",
 
-  // Universities & Other Colleges
+  // Engineering, Universities & Other Colleges
+  "St. Thomas College of Engineering and Technology",
+  "B.P. Podder Institute of Management and Technology",
   "Indian Statistical Institute (ISI)",
   "Indian Institute of Engineering Science and Technology (IIEST), Shibpur",
   "Rabindra Bharati University",
@@ -69,6 +73,13 @@ async function listColleges(req, res, next) {
     if (colleges.length === 0) {
       await College.bulkCreate(DEFAULT_COLLEGES.map((name) => ({ name })), { ignoreDuplicates: true });
       colleges = await College.findAll({ order: [["name", "ASC"]] });
+    } else {
+      const existingNames = new Set(colleges.map((c) => (c.name || "").trim().toLowerCase()));
+      const missing = DEFAULT_COLLEGES.filter((name) => !existingNames.has(name.trim().toLowerCase()));
+      if (missing.length > 0) {
+        await College.bulkCreate(missing.map((name) => ({ name })), { ignoreDuplicates: true });
+        colleges = await College.findAll({ order: [["name", "ASC"]] });
+      }
     }
     res.json(colleges);
   } catch (err) {

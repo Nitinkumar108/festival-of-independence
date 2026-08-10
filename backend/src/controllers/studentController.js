@@ -17,11 +17,11 @@ async function getMyProfile(req, res, next) {
 /** PUT /api/students/me */
 async function updateMyProfile(req, res, next) {
   try {
-    const { fullName, phoneNumber, address, collegeId } = req.body;
+    const { fullName, gender, phoneNumber, address, collegeId } = req.body;
     const student = await Student.findByPk(req.user.id);
     if (!student) return res.status(404).json({ message: "Student not found." });
 
-    await student.update({ fullName, phoneNumber, address, collegeId });
+    await student.update({ fullName, gender, phoneNumber, address, collegeId });
     res.json({ message: "Profile updated successfully." });
   } catch (err) {
     next(err);

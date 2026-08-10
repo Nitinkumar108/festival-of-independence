@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import api from "../api/axios.js";
 
-const testimonials = [
+const DEFAULT_TESTIMONIALS = [
   {
     id: 1,
     name: "Aritra Hazra",
-    designation: "MBA, IISWBM | HR, TATA Electronics",
+    designation: "HR, TATA Electronics",
+    company: "MBA, IISWBM",
     image: "/testimonials/AritraHazra.jpg",
     headline: "LIFE TRANSFORMED FOR THE BETTER!",
     quote: "After taking this course, my life has transformed for the better. It gave a clarity of thought and a purpose. It showed me the way to stay undisturbed in potentially disturbing situations. The takeaways have helped me in my student as well professional life."
@@ -12,7 +14,8 @@ const testimonials = [
   {
     id: 2,
     name: "Shibam Choudhury",
-    designation: "MBBS 2nd Year, IPGMER & SSKM Hospital",
+    designation: "MBBS 2nd Year Student",
+    company: "IPGMER & SSKM Hospital",
     image: "/testimonials/Shibam.jpg",
     headline: "DISCIPLINE & EMOTIONAL RESILIENCE!",
     quote: "Alongside my MBBS studies, this journey has helped me develop discipline, focus, and emotional resilience. Far from being a distraction, it has improved my academic performance while giving me greater clarity, confidence, and purpose."
@@ -20,7 +23,8 @@ const testimonials = [
   {
     id: 3,
     name: "Sayan Guha",
-    designation: "CEO, RG Medtech Pvt. Ltd.",
+    designation: "CEO",
+    company: "RG Medtech Pvt. Ltd.",
     image: "/testimonials/Sayan.jpg",
     headline: "LESSONS OF HUMILITY & SELFLESS SERVICE!",
     quote: "The lessons taught me discipline, humility and Selfless service. It inspired me to appreciate the importance of creating an ecosystem with the same shared values for everyone to work together with mutual respect and a common purpose to create a lasting change."
@@ -28,7 +32,8 @@ const testimonials = [
   {
     id: 4,
     name: "Aditya Anand Singh",
-    designation: "Professional Cricketer, CAB Super Division",
+    designation: "Professional Cricketer",
+    company: "CAB Super Division",
     image: "/testimonials/Aditya.jpg",
     headline: "RISE ABOVE DAILY PRESSURES!",
     quote: "It helped me rise above daily pressures and focus on what truly matters. They strengthened my mind and awakened a deeper appreciation for the Divine, revealing a connection I had never recognized before."
@@ -36,7 +41,8 @@ const testimonials = [
   {
     id: 5,
     name: "Subhojit Dhar",
-    designation: "Gold Medalist, IIEST Shibpur | Manager, TATA Steel",
+    designation: "Manager, TATA Steel",
+    company: "Gold Medalist, IIEST Shibpur",
     image: "/testimonials/subojit-pr.jpeg",
     headline: "GREATER CLARITY & DIRECTION IN LIFE!",
     quote: "This journey helped me gain greater clarity and direction in life. The practices and guidance encouraged me to stay grounded and gradually become less influenced by distractions, helping me focus more on what truly matters."
@@ -44,7 +50,8 @@ const testimonials = [
   {
     id: 6,
     name: "Arup Rai",
-    designation: "B.Tech, B.P. Poddar University | PADA Engr., Accenture",
+    designation: "PADA Engr., Accenture",
+    company: "B.Tech, B.P. Poddar University",
     image: "/testimonials/arup_rai.jpeg",
     headline: "CLEAR PURPOSE AND VISION!",
     quote: "The teachings of Vedic Scriptures gave me clear purpose and vision. Embracing selflessness, compassion, and equal vision helps me build inclusive, growth-oriented spaces, stay dedicated to excellence, and view failures as valuable lessons."
@@ -52,7 +59,8 @@ const testimonials = [
   {
     id: 7,
     name: "Adarsh Singh",
-    designation: "B.Tech, IIEST Shibpur | Software Engineer, CIMPRESS",
+    designation: "Software Engineer, CIMPRESS",
+    company: "B.Tech, IIEST Shibpur",
     image: "/testimonials/Adarsh.jpg",
     headline: "BALANCED LIFE & POSITIVE MINDSET!",
     quote: "These sessions have helped me balance my academic, professional, and personal life while managing stress with a calm and positive mindset."
@@ -60,7 +68,8 @@ const testimonials = [
   {
     id: 8,
     name: "Nitin Kr. Bais",
-    designation: "B.Tech, IIEST Shibpur | IT System Analyst, Bandhan Bank",
+    designation: "IT System Analyst, Bandhan Bank",
+    company: "B.Tech, IIEST Shibpur",
     image: "/testimonials/Nitin.jpg",
     headline: "INNER PEACE IN A FAST-PACED WORLD!",
     quote: "Spirituality has given me a balanced and focused life with a clear sense of purpose. It has helped me stay away from negativity, remain calm during challenges, and experience inner peace. I believe it is especially valuable for students in today's fast-paced world."
@@ -68,7 +77,8 @@ const testimonials = [
   {
     id: 9,
     name: "Swamynath Chourasia",
-    designation: "B.Com., Jaipuria College | Accountant",
+    designation: "Accountant",
+    company: "B.Com., Jaipuria College",
     image: "/testimonials/Swamynath.jpg",
     headline: "STRENGTHENED WISDOM & CHARACTER!",
     quote: "These sessions have helped me clearly see my goal in life and strive towards it with purpose and determination. They have strengthened my wisdom and character enabling me to make better decisions, stay focused during challenges, and become a more responsible and noble individual."
@@ -76,7 +86,8 @@ const testimonials = [
   {
     id: 10,
     name: "Aritra Roy",
-    designation: "Gold Medalist, IIEST Shibpur | Asst. Manager, HINDALCO",
+    designation: "Asst. Manager, HINDALCO",
+    company: "Gold Medalist, IIEST Shibpur",
     image: "/testimonials/Aritra.jpg",
     headline: "SPACE TO DEEPLY INTROSPECT!",
     quote: "This course gave me the space to deeply introspect about life and taught me what it truly means to be a kind and responsible gentleman. It is where I learned to take responsibility and developed the soft skills that you often don't find within the four walls of a classroom."
@@ -84,27 +95,40 @@ const testimonials = [
 ];
 
 export default function TestimonialsSection() {
+  const [items, setItems] = useState(DEFAULT_TESTIMONIALS);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
+  useEffect(() => {
+    api
+      .get("/testimonials")
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setItems(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Auto-slide every 5 seconds
   useEffect(() => {
+    if (items.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
     }, 5000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [items.length]);
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+      prevIndex === 0 ? items.length - 1 : prevIndex - 1
     );
   };
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
   };
 
   const handleTouchStart = (e) => {
@@ -127,6 +151,8 @@ export default function TestimonialsSection() {
     setTouchStart(0);
     setTouchEnd(0);
   };
+
+  const activeIndex = items.length > 0 ? currentIndex % items.length : 0;
 
   return (
     <section className="bg-cream py-10 sm:py-16 px-3 sm:px-6 lg:px-8 overflow-hidden border-t border-amber-100">
@@ -155,45 +181,53 @@ export default function TestimonialsSection() {
             {/* Horizontal Track */}
             <div
               className="flex transition-transform duration-700 ease-in-out w-full"
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+              style={{ transform: `translateX(-${activeIndex * 100}%)` }}
             >
-              {testimonials.map((item) => (
+              {items.map((item, index) => (
                 <div
-                  key={item.id}
+                  key={item.id || index}
                   className="w-full min-w-full flex-shrink-0 flex-grow-0 flex flex-col justify-between p-4 sm:p-8 md:p-10 box-border"
                 >
                   {/* Top Bar inside Card: Avatar + Name + Rating */}
                   <div className="flex flex-row items-center justify-between pb-3 sm:pb-5 border-b border-gray-100 gap-2 sm:gap-4">
                     <div className="flex items-center gap-2.5 sm:gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-12 h-12 sm:w-16 sm:h-20 rounded-full object-cover border-2 border-saffron p-0.5 bg-white flex-shrink-0 shadow-md ring-2 ring-saffron/20"
-                      />
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-saffron p-0.5 bg-white flex-shrink-0 shadow-md ring-2 ring-saffron/20"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-navy text-saffron flex items-center justify-center font-black text-lg border-2 border-saffron flex-shrink-0 shadow-md">
+                          {item.name?.charAt(0) || "U"}
+                        </div>
+                      )}
                       <div>
                         <h4 className="font-extrabold text-navy text-xs sm:text-base md:text-lg uppercase tracking-wide leading-tight">
                           {item.name}
                         </h4>
                         <p className="text-[11px] sm:text-xs md:text-sm text-indiagreen font-semibold leading-tight mt-0.5 sm:mt-1 max-w-[160px] sm:max-w-xs">
-                          {item.designation}
+                          {item.company ? `${item.designation} • ${item.company}` : item.designation}
                         </p>
                       </div>
                     </div>
 
-                    {/* 5 Golden Stars Rating Badge */}
+                    {/* Golden Stars Rating Badge */}
                     <div className="flex items-center bg-amber-50 border border-amber-200/80 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs md:text-sm text-amber-500 tracking-wider font-bold shadow-xs flex-shrink-0">
-                      ★★★★★
+                      {"★".repeat(item.rating || 5)}
                     </div>
                   </div>
 
                   {/* Headline Title */}
-                  <div className="my-3 sm:my-5 text-center">
-                    <h3 className="text-xs sm:text-sm md:text-base font-extrabold text-saffron tracking-wider uppercase">
-                      "{item.headline}"
-                    </h3>
-                  </div>
+                  {item.headline && (
+                    <div className="my-3 sm:my-5 text-center">
+                      <h3 className="text-xs sm:text-sm md:text-base font-extrabold text-saffron tracking-wider uppercase">
+                        "{item.headline}"
+                      </h3>
+                    </div>
+                  )}
 
-                  {/* Quote Body (Clean Gray Text) */}
+                  {/* Quote Body */}
                   <p className="text-gray-700 text-xs sm:text-sm md:text-base italic leading-relaxed text-center font-medium max-w-2xl mx-auto px-1 sm:px-2 mb-3 sm:mb-4">
                     "{item.quote}"
                   </p>
@@ -204,7 +238,7 @@ export default function TestimonialsSection() {
                       {item.name}
                     </span>
                     <span className="text-gray-400 font-semibold">
-                      {item.id} of {testimonials.length}
+                      {index + 1} of {items.length}
                     </span>
                   </div>
                 </div>
@@ -255,13 +289,13 @@ export default function TestimonialsSection() {
 
         {/* Dots Indicator */}
         <div className="flex justify-center items-center gap-1.5 mt-4 sm:mt-6">
-          {testimonials.map((_, idx) => (
+          {items.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
               className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 ${
-                currentIndex === idx
+                activeIndex === idx
                   ? "w-6 sm:w-7 bg-saffron"
                   : "w-2 sm:w-2.5 bg-gray-300 hover:bg-gray-400"
               }`}

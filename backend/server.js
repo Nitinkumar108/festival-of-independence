@@ -14,6 +14,7 @@ const paymentRoutes = require("./src/routes/paymentRoutes");
 const eventRoutes = require("./src/routes/eventRoutes");
 const collegeRoutes = require("./src/routes/collegeRoutes");
 const contactRoutes = require("./src/routes/contactRoutes");
+const testimonialRoutes = require("./src/routes/testimonialRoutes");
 
 const app = express();
 
@@ -40,7 +41,8 @@ app.use(
 // Razorpay webhook needs the RAW body to verify the signature,
 // so it is mounted separately BEFORE express.json().
 app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 // Basic rate limiting on auth endpoints to slow down brute-force attempts
 const authLimiter = rateLimit({
@@ -63,6 +65,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/colleges", collegeRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/testimonials", testimonialRoutes);
 
 // ----- Error handling (always last) -----
 app.use(errorMiddleware);
@@ -73,7 +76,7 @@ async function start() {
   try {
     await sequelize.authenticate();
     console.log("Database connected successfully.");
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error("Failed to start server:", err);

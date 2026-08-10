@@ -1,46 +1,45 @@
-import { useState } from "react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+import { HelpCircle, Sparkles } from "lucide-react";
 
 const faqs = [
   {
-    id: 1,
+    id: "item-1",
     q: "Who can register for the Festival of Independence programs?",
     a: "This program is specifically designed for Undergraduate (UG) college students. Any UG student interested in personal transformation, leadership development, and ancient wisdom is welcome to register.",
   },
   {
-    id: 2,
-    q: "Is there a registration fee?",
-    a: "There will be very nominal registration fees for the camps. That will be collected before the camp",
+    id: "item-2",
+    q: "Is registration free?",
+    a: "The online course is completely free.\n\nHowever, for the in-between off-line camps, if we are not able to collect sufficient sponsorship, we will collect some nominal charges from the students, just before the camp.",
   },
   {
-    id: 3,
+    id: "item-3",
     q: "How do I get my class/program joining link?",
     a: "Other than that, registered students will get the joining links in their mail IDs and college-wise WhatsApp groups.",
   },
   {
-    id: 4,
+    id: "item-4",
     q: "What is the 1-Year Journey program?",
     a: "The 1-Year Journey is a 7-milestone leadership & spiritual values program designed by IYF Kolkata to empower youth with character, clarity, competence, and compassion.",
   },
 ];
 
 export default function FaqSection() {
-  const [openId, setOpenId] = useState(1); // Default open first FAQ
-
-  const toggleFaq = (id) => {
-    setOpenId((prevId) => (prevId === id ? null : id));
-  };
-
   return (
     <section className="bg-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8 border-t border-gray-100">
       <div className="max-w-6xl mx-auto">
-        
-        {/* Modern 2-Column Grid Layout (Matching Nicepay Reference Design) */}
+        {/* Modern 2-Column Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
           {/* Left Column: Title & Description */}
           <div className="lg:col-span-5 space-y-4">
             <div className="inline-flex items-center gap-2 bg-saffron/10 border border-saffron/20 px-3.5 py-1.5 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-saffron animate-pulse"></span>
+              <Sparkles className="w-3.5 h-3.5 text-saffron animate-pulse" />
               <span className="text-saffron font-bold text-xs tracking-wider uppercase">
                 Frequently asked questions
               </span>
@@ -56,65 +55,35 @@ export default function FaqSection() {
             </p>
           </div>
 
-          {/* Right Column: Interactive Modern Cards Accordion */}
-          <div className="lg:col-span-7 space-y-4">
-            {faqs.map((item) => {
-              const isOpen = openId === item.id;
-              return (
-                <div
+          {/* Right Column: Shadcn Radix Accordion */}
+          <div className="lg:col-span-7">
+            <Accordion
+              type="single"
+              collapsible
+              defaultValue="item-1"
+              className="space-y-3.5"
+            >
+              {faqs.map((item) => (
+                <AccordionItem
                   key={item.id}
-                  className={`rounded-2xl transition-all duration-300 border ${
-                    isOpen
-                      ? "bg-slate-50/80 border-saffron/40 shadow-sm"
-                      : "bg-gray-50/60 border-gray-200/80 hover:bg-slate-50/50 hover:border-gray-300"
-                  }`}
+                  value={item.id}
+                  className="rounded-2xl border border-gray-200/80 bg-gray-50/50 px-5 sm:px-6 data-[state=open]:border-saffron/40 data-[state=open]:bg-amber-50/20 data-[state=open]:shadow-sm transition-all"
                 >
-                  <button
-                    onClick={() => toggleFaq(item.id)}
-                    className="w-full flex items-center justify-between p-5 sm:p-6 text-left focus:outline-none group"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="font-extrabold text-navy text-sm sm:text-base pr-4 leading-snug group-hover:text-saffron transition-colors">
+                  <AccordionTrigger className="font-extrabold text-navy text-sm sm:text-base hover:no-underline hover:text-saffron py-4 sm:py-5 leading-snug">
+                    <span className="flex items-center gap-3 pr-2">
+                      <HelpCircle className="w-4 h-4 text-saffron shrink-0 hidden sm:inline" />
                       {item.q}
                     </span>
-
-                    {/* Circular Arrow Toggle Icon Button */}
-                    <div
-                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                        isOpen
-                          ? "bg-saffron text-white rotate-180 shadow-md"
-                          : "bg-navy/10 text-navy group-hover:bg-saffron group-hover:text-white"
-                      }`}
-                    >
-                      <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2.5"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {/* Accordion Answer Content */}
-                  {isOpen && (
-                    <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0 text-xs sm:text-sm text-gray-600 font-medium leading-relaxed border-t border-gray-200/60 mt-1">
-                      <p className="pt-3">{item.a}</p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed pt-1 pb-4">
+                    <p className="whitespace-pre-line border-t border-gray-100 pt-3">{item.a}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
 
         </div>
-
       </div>
     </section>
   );

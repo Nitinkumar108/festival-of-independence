@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { Toaster } from "@/components/ui/sonner";
 
 import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs.jsx";
@@ -18,7 +19,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
@@ -51,6 +52,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <Toaster position="top-right" />
     </div>
   );
 }

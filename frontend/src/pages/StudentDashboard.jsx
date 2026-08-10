@@ -2,6 +2,25 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import {
+  CalendarDays,
+  BookOpen,
+  User,
+  Megaphone,
+  Award,
+  CheckCircle2,
+  Sparkles,
+  Clock,
+  Download,
+  ExternalLink,
+  ShieldCheck,
+  LogOut,
+  Video,
+  BookMarked,
+  MapPin,
+} from "lucide-react";
 
 const defaultCourses = [
   {
@@ -112,7 +131,7 @@ export default function StudentDashboard() {
       setFormData({
         firstName: firstName,
         lastName: lastName,
-        gender: "male",
+        gender: p.gender || "Male",
         email: p.email || "",
         phoneNumber: p.phoneNumber || "",
         address: p.address || "3C Albert Road, Near Minto Park",
@@ -149,19 +168,23 @@ export default function StudentDashboard() {
       const updatedFullName = `${formData.firstName} ${formData.lastName}`.trim();
       await api.put("/students/me", {
         fullName: updatedFullName,
+        gender: formData.gender,
         phoneNumber: formData.phoneNumber,
         address: formData.address
       });
       setSaveStatus("success");
+      toast.success("Profile updated successfully!");
       setProfile((prev) => ({
         ...prev,
         fullName: updatedFullName,
+        gender: formData.gender,
         phoneNumber: formData.phoneNumber,
         address: formData.address
       }));
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (err) {
       setSaveStatus("error");
+      toast.error("Failed to update profile.");
     }
   }
 
@@ -172,6 +195,7 @@ export default function StudentDashboard() {
         ...prev,
         firstName: parts[0] || "",
         lastName: parts.slice(1).join(" ") || "",
+        gender: profile.gender || "Male",
         phoneNumber: profile.phoneNumber || "",
         address: profile.address || ""
       }));
@@ -214,11 +238,11 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-amber-50/30 via-slate-50/50 to-amber-50/20 py-8 sm:py-12 px-3 sm:px-6">
+    <div className="w-full flex-1 flex flex-col bg-[#F4F4F8] py-3 sm:py-5 px-3 sm:px-6 font-sans">
       
       {/* Top Notice Banner if announcements exist */}
       {notifications.length > 0 && (
-        <div className="max-w-5xl mx-auto mb-6 bg-amber-50/90 border border-amber-200/80 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3">
+        <div className="w-full max-w-6xl mx-auto mb-3 sm:mb-4 bg-amber-50/90 border border-amber-200/80 rounded-2xl p-3 sm:p-4 shadow-sm flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-navy">
             <span className="text-base">📢</span>
             <span>You have <strong className="text-saffron">{notifications.length}</strong> active announcement(s) from IYF Kolkata.</span>
@@ -241,28 +265,28 @@ export default function StudentDashboard() {
       )}
 
       {/* Main Card Dashboard Container */}
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100/80 overflow-hidden">
-        <div className="grid md:grid-cols-12 min-h-[640px]">
+      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col bg-white rounded-[28px] sm:rounded-[34px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.06)] border border-gray-100/90 overflow-hidden my-auto">
+        <div className="grid md:grid-cols-12 flex-1 w-full items-stretch">
           
-          {/* Left Column: Profile Sidebar Nav */}
-          <div className="md:col-span-4 bg-slate-50/80 border-r border-gray-100 p-6 flex flex-col justify-between">
+          {/* Left Column: Profile Sidebar Nav (md:col-span-4 lg:col-span-3) */}
+          <div className="md:col-span-4 lg:col-span-3 bg-slate-50/90 border-r border-gray-100 p-5 sm:p-6 flex flex-col justify-between h-full">
             <div className="space-y-6">
               
               {/* Avatar & Info Header */}
               <div className="flex flex-col items-center text-center pt-2">
                 <div className="relative mb-3.5 group">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-saffron via-amber-400 to-navy text-white flex items-center justify-center font-extrabold text-3xl shadow-md ring-4 ring-white">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-[#FFB877] via-[#FF8432] to-[#311D4E] text-white flex items-center justify-center font-extrabold text-2xl sm:text-3xl shadow-md ring-4 ring-white">
                     {profile.fullName?.charAt(0).toUpperCase() || "S"}
                   </div>
                   <button
                     aria-label="Edit Profile Avatar"
-                    className="absolute bottom-0.5 right-1 w-7.5 h-7.5 bg-saffron text-white rounded-full flex items-center justify-center text-xs shadow-md hover:scale-110 transition-transform ring-2 ring-white"
+                    className="absolute bottom-0.5 right-1 w-7 h-7 bg-saffron text-navy rounded-full flex items-center justify-center text-xs shadow-md hover:scale-110 transition-transform ring-2 ring-white"
                   >
                     ✏️
                   </button>
                 </div>
 
-                <h2 className="text-xl font-bold tracking-tight text-navy mb-0.5">{profile.fullName}</h2>
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-navy mb-0.5">{profile.fullName}</h2>
                 <p className="text-xs font-medium text-gray-500 mb-2">
                   Student Participant
                 </p>
@@ -275,47 +299,47 @@ export default function StudentDashboard() {
               <nav className="space-y-1.5 pt-2">
                 <button
                   onClick={() => setActiveTab("events")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                     activeTab === "events"
                       ? "bg-amber-100/70 text-saffron shadow-2xs"
                       : "text-gray-600 hover:bg-gray-100/80"
                   }`}
                 >
-                  <span className="text-base">📅</span> Schedule & Events ({registeredEvents.length})
+                  <CalendarDays className="w-4 h-4 text-saffron" /> Schedule & Events ({registeredEvents.length})
                 </button>
 
                 <button
                   onClick={() => setActiveTab("courses")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                     activeTab === "courses"
                       ? "bg-amber-100/70 text-saffron shadow-2xs"
                       : "text-gray-600 hover:bg-gray-100/80"
                   }`}
                 >
-                  <span className="text-base">📚</span> My Courses ({defaultCourses.length})
+                  <BookOpen className="w-4 h-4 text-saffron" /> My Courses ({defaultCourses.length})
                 </button>
 
                 <button
                   onClick={() => setActiveTab("personal")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                     activeTab === "personal"
                       ? "bg-amber-100/70 text-saffron shadow-2xs"
                       : "text-gray-600 hover:bg-gray-100/80"
                   }`}
                 >
-                  <span className="text-base">👤</span> Personal Information
+                  <User className="w-4 h-4 text-saffron" /> Personal Information
                 </button>
 
                 <button
                   onClick={() => setActiveTab("notifications")}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                  className={`w-full flex items-center justify-between px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                     activeTab === "notifications"
                       ? "bg-amber-100/70 text-saffron shadow-2xs"
                       : "text-gray-600 hover:bg-gray-100/80"
                   }`}
                 >
                   <span className="flex items-center gap-3">
-                    <span className="text-base">📢</span> Announcements
+                    <Megaphone className="w-4 h-4 text-saffron" /> Announcements
                   </span>
                   {notifications.length > 0 && (
                     <span className="text-[10px] font-extrabold text-white bg-saffron px-2 py-0.5 rounded-full">
@@ -326,21 +350,31 @@ export default function StudentDashboard() {
 
                 <button
                   onClick={() => setActiveTab("certificates")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                     activeTab === "certificates"
                       ? "bg-amber-100/70 text-saffron shadow-2xs"
                       : "text-gray-600 hover:bg-gray-100/80"
                   }`}
                 >
-                  <span className="text-base">🏆</span> Certificates
+                  <Award className="w-4 h-4 text-saffron" /> Certificates
                 </button>
               </nav>
             </div>
 
+            {/* Logout Action at Bottom */}
+            <div className="pt-4 border-t border-gray-200/80 mt-4">
+              <button
+                onClick={handleLogoutClick}
+                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+              >
+                <LogOut className="w-4 h-4 text-red-500" /> Log Out
+              </button>
+            </div>
+
           </div>
 
-          {/* Right Column: Tab Content */}
-          <div className="md:col-span-8 p-6 sm:p-10 flex flex-col justify-between">
+          {/* Right Column: Tab Content (md:col-span-8 lg:col-span-9) */}
+          <div className="md:col-span-8 lg:col-span-9 p-5 sm:p-8 lg:p-10 flex flex-col justify-between h-full overflow-y-auto">
             
             {/* 1. PERSONAL INFORMATION FORM TAB */}
             {activeTab === "personal" && (
@@ -364,8 +398,8 @@ export default function StudentDashboard() {
                     <input
                       type="radio"
                       name="gender"
-                      value="male"
-                      checked={formData.gender === "male"}
+                      value="Male"
+                      checked={formData.gender?.toLowerCase() === "male"}
                       onChange={handleFormChange}
                       className="accent-saffron w-4 h-4"
                     />
@@ -375,8 +409,8 @@ export default function StudentDashboard() {
                     <input
                       type="radio"
                       name="gender"
-                      value="female"
-                      checked={formData.gender === "female"}
+                      value="Female"
+                      checked={formData.gender?.toLowerCase() === "female"}
                       onChange={handleFormChange}
                       className="accent-saffron w-4 h-4"
                     />

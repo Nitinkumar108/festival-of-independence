@@ -8,6 +8,7 @@ const ContactMessage = require("./ContactMessage");
 const OtpVerification = require("./OtpVerification");
 const Notification = require("./Notification");
 const EventRegistration = require("./EventRegistration");
+const Testimonial = require("./Testimonial");
 
 // ----- Associations -----
 College.hasMany(Student, { foreignKey: "collegeId" });
@@ -33,4 +34,5 @@ module.exports = {
   OtpVerification,
   Notification,
   EventRegistration,
+  Testimonial,
 };

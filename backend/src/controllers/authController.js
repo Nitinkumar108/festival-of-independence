@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const { Student, Admin, OtpVerification } = require("../models");
+const { Student, Admin, OtpVerification, College } = require("../models");
 const generateToken = require("../utils/generateToken");
 const sendEmail = require("../utils/sendEmail");
 const { Op } = require("sequelize");
@@ -87,10 +87,10 @@ async function verifyOtp(req, res, next) {
 /** POST /api/auth/student/register */
 async function registerStudent(req, res, next) {
   try {
-    const { fullName, collegeId, phoneNumber, address, email, username, password } = req.body;
+    const { fullName, collegeId, customCollegeName, gender, phoneNumber, address, email, username, password } = req.body;
 
-    if (!fullName || !collegeId || !phoneNumber || !address || !email || !username || !password) {
-      return res.status(400).json({ message: "All fields are required." });
+    if (!fullName || (!collegeId && !customCollegeName) || !phoneNumber || !address || !email || !username || !password) {
+      return res.status(400).json({ message: "All required fields must be filled." });
     }
 
     // Verify Email OTP status (Mobile verification disabled as requested)
@@ -102,10 +102,32 @@ async function registerStudent(req, res, next) {
       return res.status(400).json({ message: "Email has not been verified via OTP yet." });
     }
 
+    // Resolve College: If customCollegeName is provided, find or create the college in DB
+    let finalCollegeId = collegeId;
+    if (customCollegeName && customCollegeName.trim().length > 0) {
+      const trimmedName = customCollegeName.trim();
+      const [customCollege] = await College.findOrCreate({
+        where: { name: trimmedName },
+        defaults: { name: trimmedName },
+      });
+      finalCollegeId = customCollege.id;
+    } else if (collegeId) {
+      // If collegeId is a college name string rather than a UUID, find or create it
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(collegeId);
+      if (!isUuid) {
+        const [cByName] = await College.findOrCreate({
+          where: { name: collegeId },
+          defaults: { name: collegeId },
+        });
+        finalCollegeId = cByName.id;
+      }
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
     const student = await Student.create({
       fullName,
-      collegeId,
+      gender: gender || null,
+      collegeId: finalCollegeId,
       phoneNumber,
       address,
       email,
@@ -116,7 +138,7 @@ async function registerStudent(req, res, next) {
     const token = generateToken({ id: student.id, role: "student" });
     res.status(201).json({
       token,
-      student: { id: student.id, fullName: student.fullName, email: student.email },
+      student: { id: student.id, fullName: student.fullName, email: student.email, gender: student.gender },
     });
   } catch (err) {
     next(err);
