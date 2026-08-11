@@ -9,7 +9,6 @@ import {
   Building2,
   Megaphone,
   Calendar,
-  MessageSquareQuote,
   Mail,
   Users,
   UserCheck,
@@ -20,7 +19,6 @@ import {
   Trash2,
   Edit3,
   Search,
-  Star,
   Upload,
   ShieldCheck,
   CheckCircle2,
@@ -28,6 +26,11 @@ import {
   FileSpreadsheet,
   CalendarDays,
   User,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+  RotateCcw,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -38,11 +41,13 @@ export default function AdminDashboard() {
 
   // Students state & filters
   const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
-  const [loadingStudents, setLoadingStudents] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Notifications state
   const [notifications, setNotifications] = useState([]);
@@ -76,22 +81,6 @@ export default function AdminDashboard() {
 
   // Super Admin Privilege Check
   const isSuperAdmin = user?.role === "SuperAdmin" || user?.adminRole === "SuperAdmin";
-
-  // Testimonials state
-  const [testimonials, setTestimonials] = useState([]);
-  const [loadingTestimonials, setLoadingTestimonials] = useState(false);
-  const [testimonialForm, setTestimonialForm] = useState({
-    name: "",
-    designation: "",
-    company: "",
-    headline: "",
-    quote: "",
-    image: "",
-    rating: 5,
-  });
-  const [addingTestimonial, setAddingTestimonial] = useState(false);
-  const [testimonialFeedback, setTestimonialFeedback] = useState("");
-  const [editingTestimonial, setEditingTestimonial] = useState(null);
 
   // Admin Team state
   const [adminTeam, setAdminTeam] = useState([]);
@@ -128,7 +117,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchColleges();
-    fetchTestimonials();
   }, []);
 
   useEffect(() => {
@@ -136,120 +124,10 @@ export default function AdminDashboard() {
     if (activeTab === "notifications") fetchNotifications();
     if (activeTab === "events") fetchEvents();
     if (activeTab === "colleges") fetchColleges();
-    if (activeTab === "testimonials") fetchTestimonials();
     if (activeTab === "team") fetchAdminTeam();
     if (activeTab === "messages") fetchContactMessages();
-  }, [activeTab, paymentStatus, selectedCollege, selectedDate]);
+  }, [activeTab, paymentStatus, selectedCollege, selectedDate, selectedGender]);
 
-  async function fetchTestimonials() {
-    setLoadingTestimonials(true);
-    try {
-      const res = await api.get("/testimonials");
-      setTestimonials(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingTestimonials(false);
-    }
-  }
-
-  function countWords(str) {
-    if (!str) return 0;
-    return str.trim().split(/\s+/).filter(Boolean).length;
-  }
-
-  function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setTestimonialFeedback("Image size must be less than 5MB.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setTestimonialForm((prev) => ({ ...prev, image: reader.result }));
-    };
-    reader.readAsDataURL(file);
-  }
-
-  async function handleAddTestimonial(e) {
-    e.preventDefault();
-    if (!testimonialForm.name.trim() || !testimonialForm.designation.trim() || !testimonialForm.quote.trim()) {
-      setTestimonialFeedback("Name, designation, and quote are required.");
-      return;
-    }
-    const words = countWords(testimonialForm.quote);
-    if (words > 50) {
-      setTestimonialFeedback(`Quote cannot exceed 50 words (currently ${words} words).`);
-      return;
-    }
-
-    setAddingTestimonial(true);
-    setTestimonialFeedback("");
-    try {
-      if (editingTestimonial) {
-        await api.put(`/testimonials/${editingTestimonial.id}`, testimonialForm);
-        setTestimonialFeedback("Testimonial updated successfully!");
-        setEditingTestimonial(null);
-      } else {
-        await api.post("/testimonials", testimonialForm);
-        setTestimonialFeedback("Testimonial published successfully! It will now appear on the home page.");
-      }
-      setTestimonialForm({
-        name: "",
-        designation: "",
-        company: "",
-        headline: "",
-        quote: "",
-        image: "",
-        rating: 5,
-      });
-      fetchTestimonials();
-    } catch (err) {
-      setTestimonialFeedback(err.response?.data?.message || "Failed to save testimonial.");
-    } finally {
-      setAddingTestimonial(false);
-    }
-  }
-
-  function handleStartEditTestimonial(item) {
-    setEditingTestimonial(item);
-    setTestimonialForm({
-      name: item.name || "",
-      designation: item.designation || "",
-      company: item.company || "",
-      headline: item.headline || "",
-      quote: item.quote || "",
-      image: item.image || "",
-      rating: item.rating || 5,
-    });
-    setTestimonialFeedback("");
-  }
-
-  function handleCancelEditTestimonial() {
-    setEditingTestimonial(null);
-    setTestimonialForm({
-      name: "",
-      designation: "",
-      company: "",
-      headline: "",
-      quote: "",
-      image: "",
-      rating: 5,
-    });
-    setTestimonialFeedback("");
-  }
-
-  async function handleDeleteTestimonial(id, name) {
-    if (!confirm(`Are you sure you want to delete the testimonial for "${name}"?`)) return;
-    try {
-      await api.delete(`/testimonials/${id}`);
-      toast.success("Testimonial deleted successfully.");
-      fetchTestimonials();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete testimonial.");
-    }
-  }
 
   async function fetchContactMessages() {
     setLoadingContactMsgs(true);
@@ -269,9 +147,10 @@ export default function AdminDashboard() {
       const res = await api.get("/admin/students", {
         params: {
           search: search || undefined,
-          paymentStatus: paymentStatus || undefined,
           college: selectedCollege || undefined,
           date: selectedDate || undefined,
+          gender: selectedGender || undefined,
+          paymentStatus: paymentStatus || undefined,
         },
       });
       setStudents(res.data);
@@ -337,9 +216,10 @@ export default function AdminDashboard() {
       const res = await api.get("/admin/students/export", {
         params: {
           search: search || undefined,
-          paymentStatus: paymentStatus || undefined,
           college: selectedCollege || undefined,
           date: selectedDate || undefined,
+          gender: selectedGender || undefined,
+          paymentStatus: paymentStatus || undefined,
         },
         responseType: "blob",
       });
@@ -649,24 +529,6 @@ export default function AdminDashboard() {
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("testimonials")}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
-                    activeTab === "testimonials"
-                      ? "bg-amber-100/70 text-saffron shadow-2xs"
-                      : "text-gray-600 hover:bg-gray-100/80"
-                  }`}
-                >
-                  <span className="flex items-center gap-3">
-                    <MessageSquareQuote className="w-4 h-4 text-saffron" /> Testimonials
-                  </span>
-                  {testimonials.length > 0 && (
-                    <span className="text-[10px] font-extrabold bg-white text-navy px-2 py-0.5 rounded-full border border-gray-200">
-                      {testimonials.length}
-                    </span>
-                  )}
-                </button>
-
-                <button
                   onClick={() => setActiveTab("messages")}
                   className={`w-full flex items-center justify-between px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                     activeTab === "messages"
@@ -740,110 +602,224 @@ export default function AdminDashboard() {
                   </button>
                 </div>
 
-                {/* Search & Filter Controls Panel */}
-                <div className="bg-gray-50/90 p-4 rounded-2xl border border-gray-200/80 space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                    {/* 1. Search Input */}
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
-                        🔍 Search
-                      </label>
+                {/* Search Bar & Single "Filter by" Option Row */}
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && fetchStudents()}
-                        placeholder="Name, email, or phone"
-                        className="w-full bg-white rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
+                        placeholder="Search student by name, email, or phone..."
+                        className="w-full bg-gray-50/90 hover:bg-white focus:bg-white rounded-xl pl-10 pr-8 py-2.5 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs transition-all"
                       />
-                    </div>
-
-                    {/* 2. College Filter Dropdown */}
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
-                        🏫 Filter by College
-                      </label>
-                      <select
-                        value={selectedCollege}
-                        onChange={(e) => setSelectedCollege(e.target.value)}
-                        className="w-full bg-white rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
-                      >
-                        <option value="">All Colleges</option>
-                        {[...colleges]
-                          .sort((a, b) => {
-                            const aName = (a.name || "").trim();
-                            const bName = (b.name || "").trim();
-                            const aOther = aName.toLowerCase().startsWith("other");
-                            const bOther = bName.toLowerCase().startsWith("other");
-                            if (aOther && !bOther) return 1;
-                            if (!aOther && bOther) return -1;
-                            return aName.localeCompare(bName, undefined, { sensitivity: "base" });
-                          })
-                          .map((c) => (
-                            <option key={c.id} value={c.name}>
-                              {c.name}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-
-                    {/* 3. Registration Date Filter */}
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
-                        📅 Filter by Date
-                      </label>
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="w-full bg-white rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
-                      />
-                    </div>
-
-                    {/* 4. Payment / Status Filter */}
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
-                        💳 Status
-                      </label>
-                      <select
-                        value={paymentStatus}
-                        onChange={(e) => setPaymentStatus(e.target.value)}
-                        className="w-full bg-white rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron shadow-2xs"
-                      >
-                        <option value="">All Statuses</option>
-                        <option value="Paid">✓ Confirmed / Paid</option>
-                        <option value="Pending">⏳ Pending</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Filter Action Toolbar */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200/60">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[11px] font-extrabold text-navy">
-                        Found {students.length} student{students.length !== 1 ? "s" : ""}
-                      </span>
-                      {(search || selectedCollege || selectedDate || paymentStatus) && (
+                      {search && (
                         <button
-                          onClick={() => {
-                            setSearch("");
-                            setSelectedCollege("");
-                            setSelectedDate("");
-                            setPaymentStatus("");
-                          }}
-                          className="text-[11px] font-bold text-red-600 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg border border-red-200 transition-colors"
+                          onClick={() => setSearch("")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-bold"
                         >
-                          ✕ Clear Filters
+                          ✕
                         </button>
                       )}
                     </div>
 
+                    {/* Single "Filter by" Dropdown Trigger */}
                     <button
-                      onClick={fetchStudents}
-                      className="bg-saffron text-navy text-xs font-bold px-4 py-1.5 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-2xs"
+                      type="button"
+                      onClick={() => setIsFilterOpen((prev) => !prev)}
+                      className={`flex items-center justify-between sm:justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all border shadow-2xs ${
+                        isFilterOpen || (selectedCollege || selectedDate || selectedGender)
+                          ? "bg-amber-100/80 border-saffron text-navy"
+                          : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+                      }`}
                     >
-                      Apply Filter
+                      <span className="flex items-center gap-2">
+                        <SlidersHorizontal className="w-4 h-4 text-saffron" />
+                        <span>Filter by</span>
+                      </span>
+                      {(selectedCollege || selectedDate || selectedGender) && (
+                        <span className="bg-saffron text-navy text-[10px] font-black px-2 py-0.5 rounded-full">
+                          {(selectedCollege ? 1 : 0) + (selectedDate ? 1 : 0) + (selectedGender ? 1 : 0)}
+                        </span>
+                      )}
+                      {isFilterOpen ? (
+                        <ChevronUp className="w-3.5 h-3.5 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                      )}
                     </button>
                   </div>
+
+                  {/* Single "Filter by" Expandable Box: College, Date, Gender */}
+                  {isFilterOpen && (
+                    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-saffron/40 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <Filter className="w-4 h-4 text-saffron" />
+                          <h3 className="text-xs sm:text-sm font-extrabold text-navy">Filter Registrations</h3>
+                          <span className="text-[11px] text-gray-400 font-medium">
+                            (College, Date, Gender)
+                          </span>
+                        </div>
+                        {(selectedCollege || selectedDate || selectedGender) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedCollege("");
+                              setSelectedDate("");
+                              setSelectedGender("");
+                            }}
+                            className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg transition-colors"
+                          >
+                            <RotateCcw className="w-3 h-3" /> Reset All
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {/* 1. Filter by College */}
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                            🏫 Filter by College
+                          </label>
+                          <select
+                            value={selectedCollege}
+                            onChange={(e) => setSelectedCollege(e.target.value)}
+                            className="w-full bg-gray-50 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron focus:bg-white"
+                          >
+                            <option value="">All Colleges</option>
+                            {[...colleges]
+                              .sort((a, b) => {
+                                const aName = (a.name || "").trim();
+                                const bName = (b.name || "").trim();
+                                const aOther = aName.toLowerCase().startsWith("other");
+                                const bOther = bName.toLowerCase().startsWith("other");
+                                if (aOther && !bOther) return 1;
+                                if (!aOther && bOther) return -1;
+                                return aName.localeCompare(bName, undefined, { sensitivity: "base" });
+                              })
+                              .map((c) => (
+                                <option key={c.id} value={c.name}>
+                                  {c.name}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+
+                        {/* 2. Filter by Date */}
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                            📅 Filter by Date
+                          </label>
+                          <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="w-full bg-gray-50 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron focus:bg-white"
+                          />
+                        </div>
+
+                        {/* 3. Filter by Gender */}
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                            🚻 Filter by Gender
+                          </label>
+                          <select
+                            value={selectedGender}
+                            onChange={(e) => setSelectedGender(e.target.value)}
+                            className="w-full bg-gray-50 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold border border-gray-200 focus:outline-none focus:border-saffron focus:bg-white"
+                          >
+                            <option value="">All Genders</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Bottom Footer inside filter */}
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-xs">
+                        <span className="text-[11px] font-extrabold text-navy">
+                          Found {students.length} student{students.length !== 1 ? "s" : ""}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              fetchStudents();
+                              setIsFilterOpen(false);
+                            }}
+                            className="bg-saffron text-navy font-bold text-xs px-4 py-1.5 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-2xs"
+                          >
+                            Apply & Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Active Filter Chips / Pills Row */}
+                  {(selectedCollege || selectedDate || selectedGender || search) && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      <span className="text-[11px] font-bold text-gray-400 mr-1">Active filters:</span>
+                      {selectedCollege && (
+                        <span className="inline-flex items-center gap-1 bg-amber-50 text-navy border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                          <span>🏫 College: {selectedCollege}</span>
+                          <button
+                            onClick={() => setSelectedCollege("")}
+                            className="text-gray-400 hover:text-red-600 font-bold ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      )}
+                      {selectedDate && (
+                        <span className="inline-flex items-center gap-1 bg-amber-50 text-navy border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                          <span>📅 Date: {selectedDate}</span>
+                          <button
+                            onClick={() => setSelectedDate("")}
+                            className="text-gray-400 hover:text-red-600 font-bold ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      )}
+                      {selectedGender && (
+                        <span className="inline-flex items-center gap-1 bg-amber-50 text-navy border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                          <span>🚻 Gender: {selectedGender}</span>
+                          <button
+                            onClick={() => setSelectedGender("")}
+                            className="text-gray-400 hover:text-red-600 font-bold ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      )}
+                      {search && (
+                        <span className="inline-flex items-center gap-1 bg-blue-50 text-navy border border-blue-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                          <span>🔍 Search: "{search}"</span>
+                          <button
+                            onClick={() => setSearch("")}
+                            className="text-gray-400 hover:text-red-600 font-bold ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSearch("");
+                          setSelectedCollege("");
+                          setSelectedDate("");
+                          setSelectedGender("");
+                        }}
+                        className="text-[11px] font-bold text-red-600 hover:underline px-2 py-0.5"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Students Table */}
@@ -1451,322 +1427,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* TAB: TESTIMONIALS MANAGEMENT */}
-            {activeTab === "testimonials" && (
-              <div className="space-y-6">
-                <div className="border-b border-gray-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h2 className="text-xl font-extrabold tracking-tight text-navy">Manage Testimonials</h2>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Add, edit, and manage testimonials dynamically displayed on the Home page carousel.
-                    </p>
-                  </div>
-                  <button
-                    onClick={fetchTestimonials}
-                    className="text-xs font-bold text-navy bg-gray-100 hover:bg-gray-200 px-3.5 py-2 rounded-xl transition-all self-start sm:self-auto"
-                  >
-                    🔄 Refresh
-                  </button>
-                </div>
 
-                <div className="grid lg:grid-cols-12 gap-6">
-                  {/* Left Column (5 Cols): Add / Edit Testimonial Form */}
-                  <div className="lg:col-span-5 bg-gray-50/90 rounded-2xl p-5 border border-gray-200/80 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-extrabold text-navy">
-                        {editingTestimonial ? "✏️ Edit Testimonial" : "➕ Add New Testimonial"}
-                      </h3>
-                      {editingTestimonial && (
-                        <button
-                          type="button"
-                          onClick={handleCancelEditTestimonial}
-                          className="text-xs text-gray-500 hover:text-navy font-bold underline"
-                        >
-                          Cancel
-                        </button>
-                      )}
-                    </div>
-
-                    <form onSubmit={handleAddTestimonial} className="space-y-3.5 text-xs sm:text-sm">
-                      {/* Name */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
-                          Person Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          value={testimonialForm.name}
-                          onChange={(e) => setTestimonialForm({ ...testimonialForm, name: e.target.value })}
-                          placeholder="e.g. Rahul Sharma"
-                          required
-                          className="w-full bg-white rounded-xl px-3.5 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
-                        />
-                      </div>
-
-                      {/* Designation */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
-                          Designation <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          value={testimonialForm.designation}
-                          onChange={(e) => setTestimonialForm({ ...testimonialForm, designation: e.target.value })}
-                          placeholder="e.g. Software Engineer / MBBS Student"
-                          required
-                          className="w-full bg-white rounded-xl px-3.5 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
-                        />
-                      </div>
-
-                      {/* Company / College */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
-                          Company / Institution
-                        </label>
-                        <input
-                          value={testimonialForm.company}
-                          onChange={(e) => setTestimonialForm({ ...testimonialForm, company: e.target.value })}
-                          placeholder="e.g. Google / IIEST Shibpur / IPGMER"
-                          className="w-full bg-white rounded-xl px-3.5 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
-                        />
-                      </div>
-
-                      {/* Headline */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
-                          Headline / Highlight
-                        </label>
-                        <input
-                          value={testimonialForm.headline}
-                          onChange={(e) => setTestimonialForm({ ...testimonialForm, headline: e.target.value })}
-                          placeholder="e.g. LIFE TRANSFORMED FOR THE BETTER!"
-                          className="w-full bg-white rounded-xl px-3.5 py-2.5 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
-                        />
-                      </div>
-
-                      {/* Image Upload Option */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
-                          Photo / Avatar
-                        </label>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-3">
-                            {testimonialForm.image ? (
-                              <div className="relative group">
-                                <img
-                                  src={testimonialForm.image}
-                                  alt="Preview"
-                                  className="w-14 h-14 rounded-full object-cover border-2 border-saffron shadow-sm"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => setTestimonialForm((prev) => ({ ...prev, image: "" }))}
-                                  className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-black"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-xl border border-gray-300">
-                                👤
-                              </div>
-                            )}
-
-                            <label className="flex-1 cursor-pointer bg-white hover:bg-gray-100 border border-gray-200 rounded-xl px-3.5 py-2.5 text-center font-bold text-navy text-xs transition-colors shadow-2xs">
-                              <span>📁 Choose Photo</span>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                className="hidden"
-                              />
-                            </label>
-                          </div>
-                          <input
-                            value={testimonialForm.image}
-                            onChange={(e) => setTestimonialForm({ ...testimonialForm, image: e.target.value })}
-                            placeholder="Or paste direct image URL (optional)"
-                            className="w-full bg-white rounded-xl px-3.5 py-2 text-[11px] font-medium border border-gray-200 focus:outline-none focus:border-saffron text-gray-600"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Testimonial Quote with 50 Word Limit Indicator */}
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider">
-                            Testimonial Quote <span className="text-red-500">*</span>
-                          </label>
-                          <span
-                            className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${
-                              countWords(testimonialForm.quote) > 50
-                                ? "bg-red-100 text-red-700 font-extrabold animate-pulse"
-                                : countWords(testimonialForm.quote) > 40
-                                ? "bg-amber-100 text-amber-800"
-                                : "bg-emerald-50 text-emerald-700"
-                            }`}
-                          >
-                            {countWords(testimonialForm.quote)} / 50 words
-                          </span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={testimonialForm.quote}
-                          onChange={(e) => setTestimonialForm({ ...testimonialForm, quote: e.target.value })}
-                          placeholder="Share the impact, learning, or experience (maximum 50 words)..."
-                          required
-                          className={`w-full bg-white rounded-xl px-3.5 py-2.5 font-semibold border ${
-                            countWords(testimonialForm.quote) > 50
-                              ? "border-red-500 focus:border-red-500"
-                              : "border-gray-200 focus:border-saffron"
-                          } focus:outline-none`}
-                        />
-                        {countWords(testimonialForm.quote) > 50 && (
-                          <p className="text-[11px] text-red-600 font-bold mt-1">
-                            ⚠️ Limit exceeded! Please shorten by {countWords(testimonialForm.quote) - 50} word{countWords(testimonialForm.quote) - 50 !== 1 ? "s" : ""}.
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Rating Selector */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
-                          Star Rating
-                        </label>
-                        <select
-                          value={testimonialForm.rating}
-                          onChange={(e) => setTestimonialForm({ ...testimonialForm, rating: parseInt(e.target.value) })}
-                          className="w-full bg-white rounded-xl px-3.5 py-2 font-semibold border border-gray-200 focus:outline-none focus:border-saffron"
-                        >
-                          <option value={5}>★★★★★ (5 Stars)</option>
-                          <option value={4}>★★★★☆ (4 Stars)</option>
-                          <option value={3}>★★★☆☆ (3 Stars)</option>
-                        </select>
-                      </div>
-
-                      {testimonialFeedback && (
-                        <p
-                          className={`text-xs font-bold p-2.5 rounded-xl ${
-                            testimonialFeedback.includes("success")
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-red-50 text-red-600 border border-red-200"
-                          }`}
-                        >
-                          {testimonialFeedback}
-                        </p>
-                      )}
-
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          type="submit"
-                          disabled={addingTestimonial || countWords(testimonialForm.quote) > 50}
-                          className="flex-1 bg-saffron text-navy font-bold py-3 rounded-xl hover:bg-indiagreen hover:text-white transition-all shadow-xs disabled:opacity-50"
-                        >
-                          {addingTestimonial
-                            ? "Saving..."
-                            : editingTestimonial
-                            ? "Save Changes"
-                            : "Publish Testimonial"}
-                        </button>
-                        {editingTestimonial && (
-                          <button
-                            type="button"
-                            onClick={handleCancelEditTestimonial}
-                            className="px-4 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition-all"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                      </div>
-                    </form>
-                  </div>
-
-                  {/* Right Column (7 Cols): Live Testimonials Directory */}
-                  <div className="lg:col-span-7 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-extrabold text-navy">
-                        Live Testimonials Directory ({testimonials.length})
-                      </h3>
-                      <span className="text-[11px] font-bold text-gray-400">
-                        Displays in Home Page Slider
-                      </span>
-                    </div>
-
-                    {loadingTestimonials ? (
-                      <p className="text-xs text-gray-500 italic py-6 text-center">Loading testimonials...</p>
-                    ) : testimonials.length === 0 ? (
-                      <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                        <p className="text-sm font-bold text-gray-600">No Testimonials Yet</p>
-                        <p className="text-xs text-gray-400 mt-1">Add your first testimonial using the form on the left.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3 max-h-[640px] overflow-y-auto pr-1">
-                        {testimonials.map((item, idx) => (
-                          <div
-                            key={item.id || idx}
-                            className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-2xs hover:shadow-sm transition-all space-y-2.5"
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex items-center gap-3">
-                                {item.image ? (
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="w-11 h-11 rounded-full object-cover border-2 border-saffron flex-shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-11 h-11 rounded-full bg-navy text-saffron flex items-center justify-center font-bold text-sm flex-shrink-0">
-                                    {item.name?.charAt(0) || "U"}
-                                  </div>
-                                )}
-                                <div>
-                                  <h4 className="font-extrabold text-navy text-sm leading-tight">{item.name}</h4>
-                                  <p className="text-[11px] text-indiagreen font-semibold leading-tight">
-                                    {item.company ? `${item.designation} • ${item.company}` : item.designation}
-                                  </p>
-                                  <span className="text-amber-500 text-xs font-bold">
-                                    {"★".repeat(item.rating || 5)}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Controls */}
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <button
-                                  onClick={() => handleStartEditTestimonial(item)}
-                                  className="text-xs font-bold text-navy bg-gray-50 hover:bg-gray-100 px-2.5 py-1 rounded-lg border border-gray-200 transition-colors"
-                                >
-                                  ✏️ Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteTestimonial(item.id, item.name)}
-                                  className="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg border border-red-200 transition-colors"
-                                >
-                                  🗑️ Delete
-                                </button>
-                              </div>
-                            </div>
-
-                            {item.headline && (
-                              <p className="text-xs font-bold text-saffron uppercase tracking-wider">
-                                "{item.headline}"
-                              </p>
-                            )}
-
-                            <p className="text-xs text-gray-700 italic leading-relaxed bg-gray-50/70 p-3 rounded-xl border border-gray-100">
-                              "{item.quote}"
-                            </p>
-
-                            <div className="flex justify-between items-center text-[10px] text-gray-400 pt-1">
-                              <span>{countWords(item.quote)} words</span>
-                              <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Default"}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* TAB 7: ADMIN PROFILE INFO */}
             {activeTab === "profile" && (

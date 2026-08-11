@@ -93,13 +93,23 @@ async function registerStudent(req, res, next) {
       return res.status(400).json({ message: "All required fields must be filled." });
     }
 
-    // Verify Email OTP status (Mobile verification disabled as requested)
-    const emailOtp = await OtpVerification.findOne({
-      where: { target: email, type: "email", isVerified: true },
-    });
+    // 1. Legal Email Syntax Validation (RFC 5322 compliant regex)
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ message: "Please provide a valid and legal email address (e.g. name@example.com)." });
+    }
 
-    if (!emailOtp) {
-      return res.status(400).json({ message: "Email has not been verified via OTP yet." });
+    // 2. Check if email is already registered in the system
+    const existingStudentByEmail = await Student.findOne({ where: { email: normalizedEmail } });
+    if (existingStudentByEmail) {
+      return res.status(400).json({ message: "An account with this email is already registered. Please log in instead." });
+    }
+
+    // 3. Check if username is already taken
+    const existingStudentByUsername = await Student.findOne({ where: { username: username.trim() } });
+    if (existingStudentByUsername) {
+      return res.status(400).json({ message: "This username is already taken. Please choose a different username." });
     }
 
     // Resolve College: If customCollegeName is provided, find or create the college in DB
@@ -125,13 +135,13 @@ async function registerStudent(req, res, next) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const student = await Student.create({
-      fullName,
+      fullName: fullName.trim(),
       gender: gender || null,
       collegeId: finalCollegeId,
-      phoneNumber,
-      address,
-      email,
-      username,
+      phoneNumber: phoneNumber.trim(),
+      address: address.trim(),
+      email: normalizedEmail,
+      username: username.trim(),
       passwordHash,
     });
 
@@ -184,48 +194,7 @@ async function loginAdmin(req, res, next) {
     const isMatch = await bcrypt.compare(password, admin.passwordHash);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials." });
 
-    // ONLY SuperAdmin REQUIRES MANDATORY 2FA OTP VERIFICATION
-    if (admin.role === "SuperAdmin") {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-
-      await OtpVerification.destroy({ where: { target: email, type: "email" } });
-      await OtpVerification.create({
-        target: email,
-        code,
-        type: "email",
-        expiresAt,
-        isVerified: false,
-      });
-
-      // Send mandatory OTP to SuperAdmin email
-      await sendEmail({
-        to: email,
-        subject: "🔒 Super Admin Security Verification OTP - Festival of Independence",
-        text: `Your Super Admin Login Security OTP is: ${code}. It expires in 10 minutes.`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 12px; background: #fff;">
-            <h2 style="color: #1E293B; margin-bottom: 5px;">Festival of Independence Admin Portal</h2>
-            <p style="color: #64748B; font-size: 14px;">Super Admin 2FA Security Verification</p>
-            <div style="background: #FFF7ED; padding: 15px; border-radius: 8px; border: 1px solid #FDBA74; text-align: center; margin: 20px 0;">
-              <p style="font-size: 12px; color: #9A3412; font-weight: bold; margin: 0 0 5px 0;">YOUR 6-DIGIT VERIFICATION CODE</p>
-              <div style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #EA580C;">${code}</div>
-            </div>
-            <p style="font-size: 13px; color: #64748B;">This code is valid for 10 minutes. Do not share this OTP with anyone.</p>
-          </div>
-        `,
-      });
-
-      console.log(`🔒 [SUPER ADMIN LOGIN OTP DISPATCHED] Email: ${email} | Code: ${code}`);
-
-      return res.json({
-        requireOtp: true,
-        email,
-        message: `Mandatory security OTP sent to ${email}.`,
-      });
-    }
-
-    // Regular Admins (VolunteerAdmin) log in instantly without OTP
+    // Direct login for both SuperAdmin and VolunteerAdmin (2FA OTP verification disabled)
     const token = generateToken({ id: admin.id, role: "admin", adminRole: admin.role });
     return res.json({
       requireOtp: false,

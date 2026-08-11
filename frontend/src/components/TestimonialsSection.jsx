@@ -91,6 +91,24 @@ const DEFAULT_TESTIMONIALS = [
     image: "/testimonials/Aritra.jpg",
     headline: "SPACE TO DEEPLY INTROSPECT!",
     quote: "This course gave me the space to deeply introspect about life and taught me what it truly means to be a kind and responsible gentleman. It is where I learned to take responsibility and developed the soft skills that you often don't find within the four walls of a classroom."
+  },
+  {
+    id: 11,
+    name: "Sushovan Maity",
+    designation: "Territory Manager",
+    company: "SKF",
+    image: "/testimonials/Sushovan.png",
+    headline: "CATALYST FOR TRANSFORMATION!",
+    quote: "This is far beyond a standard course; it’s a catalyst for transformation. It helped me align my daily habits with my core values, enabling me to make conscious decisions and lead with absolute integrity in every facet of my life. For anyone serious about unlocking their full potential, leading with honor, and creating a future of true impact, this program will deliver far beyond their expectations!"
+  },
+  {
+    id: 12,
+    name: "Biswarup Dutta",
+    designation: "Law Student | Guitarist",
+    company: "Heritage Law College",
+    image: "/testimonials/Biswarup.png",
+    headline: "PERSPECTIVE TRANSFORMED TOWARDS LIFE!",
+    quote: "My journey has transformed my perspective towards life, giving me purpose, discipline, humility, compassion, gratitude, and a spirit of selfless service. It has strengthened my ability to remain patient, focused, and dedicated during challenges. I have learned to value meaningful relationships, develop a positive attitude, and use my abilities for the welfare of others. This journey has inspired me to contribute towards creating a more compassionate, inclusive, and value-driven society."
   }
 ];
 

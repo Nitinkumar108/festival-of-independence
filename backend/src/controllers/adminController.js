@@ -2,14 +2,15 @@ const bcrypt = require("bcryptjs");
 const { Student, Admin, College, Payment, Notification, EventRegistration } = require("../models");
 const exportToExcel = require("../utils/excelExport");
 
-/** GET /api/admin/students?college=&paymentStatus=&search=&date=&startDate=&endDate= */
+/** GET /api/admin/students?college=&paymentStatus=&search=&date=&startDate=&endDate=&gender= */
 async function listStudents(req, res, next) {
   try {
-    const { college, paymentStatus, search, date, startDate, endDate } = req.query;
+    const { college, paymentStatus, search, date, startDate, endDate, gender } = req.query;
     const { Op } = require("sequelize");
     const where = {};
 
     if (paymentStatus) where.paymentStatus = paymentStatus;
+    if (gender) where.gender = { [Op.iLike]: gender };
     if (search) {
       where[Op.or] = [
         { fullName: { [Op.iLike]: `%${search}%` } },
@@ -81,11 +82,12 @@ async function deleteStudent(req, res, next) {
 /** GET /api/admin/students/export — download filtered list as Excel */
 async function exportStudents(req, res, next) {
   try {
-    const { college, paymentStatus, search, date, startDate, endDate } = req.query;
+    const { college, paymentStatus, search, date, startDate, endDate, gender } = req.query;
     const { Op } = require("sequelize");
     const where = {};
 
     if (paymentStatus) where.paymentStatus = paymentStatus;
+    if (gender) where.gender = { [Op.iLike]: gender };
     if (search) {
       where[Op.or] = [
         { fullName: { [Op.iLike]: `%${search}%` } },
@@ -312,10 +314,6 @@ async function deleteAdmin(req, res, next) {
 
     const admin = await Admin.findByPk(req.params.id);
     if (!admin) return res.status(404).json({ message: "Admin not found." });
-
-    if (admin.id === req.user.id) {
-      return res.status(400).json({ message: "You cannot delete your own admin account while logged in." });
-    }
 
     await admin.destroy();
     res.json({ message: "Admin account removed." });

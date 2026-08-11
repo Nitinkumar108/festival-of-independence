@@ -65,11 +65,9 @@ export default function SupportUs() {
                 </div>
               </div>
               <a
-                href="#inflow-outflow"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert("Official Inflow-Outflow Statement sheet will open here.");
-                }}
+                href="https://docs.google.com/spreadsheets/d/11WU4Xfir_E5cxohG-FZ5lYVWDcEfm6_njRzYHdRNmvQ/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-saffron text-navy font-extrabold text-xs px-5 py-2.5 rounded-xl hover:bg-navy hover:text-white transition-all shadow-xs flex items-center gap-1.5 flex-shrink-0"
               >
                 <span>Click Here to View Sheet</span>

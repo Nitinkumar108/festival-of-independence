@@ -8,7 +8,6 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  CheckCircle2,
 } from "lucide-react";
 
 const DEFAULT_COLLEGES_LIST = [
@@ -98,13 +97,6 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Email OTP states
-  const [emailOtpSent, setEmailOtpSent] = useState(false);
-  const [emailOtpCode, setEmailOtpCode] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [emailOtpLoading, setEmailOtpLoading] = useState(false);
-  const [emailOtpMsg, setEmailOtpMsg] = useState("");
-
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -127,55 +119,6 @@ export default function Register() {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
     setError("");
-
-    if (name === "email") {
-      setEmailVerified(false);
-      setEmailOtpSent(false);
-      setEmailOtpMsg("");
-    }
-  }
-
-  async function handleSendEmailOtp() {
-    if (!form.email.trim()) {
-      setEmailOtpMsg("Please enter your email address first.");
-      toast.error("Please enter your email address.");
-      return;
-    }
-    setEmailOtpLoading(true);
-    setEmailOtpMsg("");
-    try {
-      const res = await api.post("/auth/send-otp", { type: "email", target: form.email.trim() });
-      setEmailOtpSent(true);
-      const msg = res.data.devOtp
-        ? `OTP sent! (Dev Code: ${res.data.devOtp})`
-        : "Security OTP sent to your email.";
-      setEmailOtpMsg(msg);
-      toast.success("Security verification code sent to your email!");
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to send Email OTP.";
-      setEmailOtpMsg(msg);
-      toast.error(msg);
-    } finally {
-      setEmailOtpLoading(false);
-    }
-  }
-
-  async function handleVerifyEmailOtp() {
-    if (!emailOtpCode.trim()) return;
-    setEmailOtpLoading(true);
-    setEmailOtpMsg("");
-    try {
-      await api.post("/auth/verify-otp", { type: "email", target: form.email.trim(), code: emailOtpCode.trim() });
-      setEmailVerified(true);
-      setEmailOtpMsg("Email verified successfully! ✓");
-      toast.success("Email verified successfully!");
-    } catch (err) {
-      const msg = err.response?.data?.message || "Invalid OTP code.";
-      setEmailOtpMsg(msg);
-      toast.error(msg);
-    } finally {
-      setEmailOtpLoading(false);
-    }
   }
 
   async function handleSubmit(e) {
@@ -186,8 +129,15 @@ export default function Register() {
     if (!form.gender) return setError("Please select your gender.");
     if (!form.collegeId) return setError("Please select your college or institution.");
     if (isOtherCollege && !form.customCollegeName.trim()) return setError("Please enter your college or institution name.");
-    if (!form.email.trim()) return setError("Email Address is required.");
-    if (!emailVerified) return setError("Please verify your email address with OTP before registering.");
+    
+    // Legal Email Syntax Verification
+    const trimmedEmail = form.email.trim().toLowerCase();
+    if (!trimmedEmail) return setError("Email Address is required.");
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return setError("Please enter a valid and legal email address (e.g. name@example.com).");
+    }
+
     if (!form.phoneNumber.trim()) return setError("Phone Number is required.");
     if (!form.address.trim()) return setError("Address is required.");
     if (!form.username.trim()) return setError("Username is required.");
@@ -204,7 +154,7 @@ export default function Register() {
         customCollegeName: isOtherCollege ? form.customCollegeName.trim() : "",
         phoneNumber: form.phoneNumber.trim(),
         address: form.address.trim(),
-        email: form.email.trim(),
+        email: trimmedEmail,
         username: form.username.trim(),
         password: form.password,
       });
@@ -374,62 +324,20 @@ export default function Register() {
                   )}
                 </div>
 
-                {/* Row 3: Email OTP Verification Card */}
-                <div className="border border-gray-200/90 rounded-2xl p-3 sm:p-3.5 bg-gray-50/70 space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">
-                    Email Address (OTP Verification) <span className="text-red-500">*</span>
+                {/* Row 3: Email Address */}
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1">
+                    Email Address <span className="text-red-500">*</span>
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="name@example.com"
-                      required
-                      disabled={emailVerified}
-                      className="flex-1 bg-white border border-gray-200 rounded-xl px-3.5 py-2 font-semibold text-navy focus:outline-none focus:border-saffron disabled:bg-gray-100 text-xs sm:text-sm"
-                    />
-                    {!emailVerified ? (
-                      <button
-                        type="button"
-                        onClick={handleSendEmailOtp}
-                        disabled={emailOtpLoading || !form.email.trim()}
-                        className="bg-navy text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-saffron hover:text-navy transition-all disabled:opacity-50 flex-shrink-0"
-                      >
-                        {emailOtpLoading ? "Sending..." : emailOtpSent ? "Resend" : "Send OTP"}
-                      </button>
-                    ) : (
-                      <span className="bg-emerald-100 text-emerald-700 border border-emerald-300 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Verified
-                      </span>
-                    )}
-                  </div>
-
-                  {emailOtpSent && !emailVerified && (
-                    <div className="flex gap-2 pt-1 animate-fadeIn">
-                      <input
-                        value={emailOtpCode}
-                        onChange={(e) => setEmailOtpCode(e.target.value)}
-                        placeholder="Enter 6-digit code"
-                        className="flex-1 bg-white border border-gray-200 rounded-xl px-3.5 py-2 font-semibold text-navy focus:outline-none focus:border-saffron text-xs sm:text-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleVerifyEmailOtp}
-                        disabled={emailOtpLoading || !emailOtpCode.trim()}
-                        className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-emerald-700 disabled:opacity-50 flex-shrink-0"
-                      >
-                        Verify
-                      </button>
-                    </div>
-                  )}
-                  
-                  {emailOtpMsg && (
-                    <p className={`text-[11px] ${emailVerified ? "text-emerald-700 font-bold" : "text-amber-800 font-semibold"}`}>
-                      {emailOtpMsg}
-                    </p>
-                  )}
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="name@example.com"
+                    required
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2 font-semibold text-navy placeholder:text-gray-400 focus:outline-none focus:border-saffron focus:ring-4 focus:ring-saffron/10 transition-all shadow-2xs text-xs sm:text-sm"
+                  />
                 </div>
 
                 {/* Row 4: Phone & Address */}
@@ -541,18 +449,12 @@ export default function Register() {
                 {/* Saffron Glowing Action Button */}
                 <button
                   type="submit"
-                  disabled={submitting || !emailVerified}
+                  disabled={submitting}
                   className="w-full bg-gradient-to-r from-saffron to-[#F57C00] text-navy font-black text-sm sm:text-base py-3 sm:py-3.5 rounded-xl hover:text-white transition-all shadow-[0_10px_25px_rgba(255,153,51,0.35)] hover:shadow-[0_12px_30px_rgba(255,153,51,0.5)] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
                 >
                   <span>{submitting ? "Registering…" : "Complete Registration"}</span>
                   {!submitting && <ArrowRight className="w-4 h-4" />}
                 </button>
-
-                {!emailVerified && (
-                  <p className="text-[11px] text-gray-400 text-center font-medium">
-                    * Please verify your email with the OTP code above to activate registration.
-                  </p>
-                )}
 
               </form>
             </div>
