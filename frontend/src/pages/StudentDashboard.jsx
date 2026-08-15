@@ -30,7 +30,7 @@ const defaultCourses = [
     status: "Active & Enrolled",
     statusColor: "bg-emerald-100 text-emerald-800 border-emerald-300",
     progress: 100,
-    startDate: "1 September 2026",
+    startDate: "21 September 2026",
     examDate: "13 October 2026",
     topics: [
       "Mind Management & Focus",

@@ -57,7 +57,7 @@ const nashaMuktPosters = [
 const journeyMilestones = [
   {
     step: 1,
-    date: "1 SEPTEMBER 2026",
+    date: "21 SEPTEMBER 2026",
     title: "COURSE COMMENCEMENT",
     subtitle: "The Journey Begins",
     description: "Orientation, onboarding and setting intentions for a transformative 1-year journey of self-discovery.",
@@ -299,9 +299,12 @@ export default function Home() {
           </p>
 
           {/* Side Badge Tag in Hero */}
-          <div className="mb-6 flex justify-center">
+          <div className="mb-6 flex flex-wrap justify-center items-center gap-2.5">
+            <span className="inline-flex items-center gap-2 bg-saffron text-navy font-extrabold text-xs sm:text-sm px-4 py-1.5 rounded-full shadow-md">
+              📅 <span>Starting from <strong>21st September, 2026</strong></span>
+            </span>
             <span className="inline-flex items-center gap-2 bg-saffron/20 text-saffron font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full border border-saffron/40 shadow-xs">
-              🎓 <span><strong>Note:</strong> Program strictly for <strong>Under Graduate (UG) College Students</strong></span>
+              🎓 <span><strong>Note:</strong> Strictly for <strong>UG College Students</strong></span>
             </span>
           </div>
           {token ? (

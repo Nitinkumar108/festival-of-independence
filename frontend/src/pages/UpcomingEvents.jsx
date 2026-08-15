@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 const journeyMilestones = [
   {
     step: 1,
-    date: "1 SEPTEMBER 2026",
+    date: "21 SEPTEMBER 2026",
     title: "COURSE COMMENCEMENT",
     subtitle: "The Journey Begins",
     description: "Orientation, onboarding and setting intentions for a transformative 1-year journey of self-discovery.",
