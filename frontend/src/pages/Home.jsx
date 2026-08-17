@@ -330,8 +330,8 @@ export default function Home() {
           {/* Download Event Brochure Button */}
           <div className="mt-4 flex justify-center">
             <a
-              href="/festival_of_independence_brochure.pdf?v=2"
-              download="Festival_of_Independence_Brochure.pdf"
+              href="/brochure-2026-08.pdf"
+              download="Festival_of_Independence_Brochure_2026.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-saffron hover:text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full border border-saffron/50 backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-md"
