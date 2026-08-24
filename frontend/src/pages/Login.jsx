@@ -255,7 +255,7 @@ function AdminLoginForm() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [form, setForm] = useState({ email: "nitin.231218@gmail.com", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [step, setStep] = useState(1);
@@ -436,7 +436,7 @@ function AdminLoginForm() {
         disabled={submitting}
         className="w-full bg-gradient-to-r from-saffron to-[#F57C00] text-navy font-black text-sm sm:text-base py-3 sm:py-3.5 rounded-xl hover:text-white transition-all shadow-[0_10px_25px_rgba(255,153,51,0.35)] hover:shadow-[0_12px_30px_rgba(255,153,51,0.5)] active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2 mt-1"
       >
-        <span>{submitting ? "Checking..." : "Continue to OTP Verification"}</span>
+        <span>{submitting ? "Signing in..." : "Login"}</span>
         {!submitting && <ArrowRight className="w-4 h-4" />}
       </button>
     </form>

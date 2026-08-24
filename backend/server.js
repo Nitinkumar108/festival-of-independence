@@ -13,8 +13,11 @@ const adminRoutes = require("./src/routes/adminRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
 const eventRoutes = require("./src/routes/eventRoutes");
 const collegeRoutes = require("./src/routes/collegeRoutes");
+const clusterRoutes = require("./src/routes/clusterRoutes");
 const contactRoutes = require("./src/routes/contactRoutes");
 const testimonialRoutes = require("./src/routes/testimonialRoutes");
+const { seedClustersAndColleges } = require("./src/controllers/collegeController");
+const migrateClusterSchema = require("./src/utils/migrateClusterSchema");
 
 const app = express();
 
@@ -64,6 +67,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/colleges", collegeRoutes);
+app.use("/api/clusters", clusterRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 
@@ -76,7 +80,9 @@ async function start() {
   try {
     await sequelize.authenticate();
     console.log("Database connected successfully.");
+    await migrateClusterSchema(); // Ensure clusters table & colleges columns exist in Postgres/SQLite
     await sequelize.sync({ alter: true });
+    await seedClustersAndColleges(); // Seed 9 clusters + 54 colleges on every startup
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error("Failed to start server:", err);

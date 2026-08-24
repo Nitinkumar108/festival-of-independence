@@ -11,30 +11,46 @@ import {
 } from "lucide-react";
 
 const DEFAULT_COLLEGES_LIST = [
-  // 40 Calcutta University affiliated colleges from Kolkata College Visit Plan
-  "Umeschandra College",
-  "Vidyasagar College",
-  "City College",
-  "Ananda Mohan College",
-  "City College of Commerce & B.A.",
-  "Chittaranjan College",
+  // CC1 – Hariom Prabhu
+  "NSHM Knowledge Campus",
+  "Heritage Institute of Technology",
   "Surendranath College",
-  "Bangabasi College",
-  "Acharya Girish Chandra Bose College",
-  "Goenka College of Commerce & B.A.",
-  "Scottish Church College",
-  "Seth Anandram Jaipuria College",
-  "Maharaja Manindra Chandra College",
-  "Maharaja Srischandra College",
-  "Shyambazar Law College",
-  "Sir Gurudas Mahavidyalaya",
-  "Government College of Art & Craft",
-  "Acharya Jagadish Chandra Bose College",
-  "The Bhawanipur Education Society College",
-  "Asutosh College",
-  "Charuchandra College",
+  "Bhawanipur Education Society College",
   "Heramba Chandra College",
   "Prafulla Chandra College",
+  "Asutosh College",
+  "SSKM Medical College (IPGMER)",
+  // CC2 – Yash Prabhu
+  "THK Jain College",
+  "Ananda Mohan College",
+  "Goenka College of Commerce & Business Administration",
+  "Shyambazar Law College",
+  "City College",
+  // CC3 – Suvilas Nitai Chandra Prabhu
+  "MCKV Institute of Engineering",
+  "Swami Vivekananda College",
+  "Scottish Church College",
+  "South Calcutta Law College",
+  "St. Thomas College of Engineering and Technology",
+  "Indian Statistical Institute (ISI)",
+  "Government College of Art & Craft",
+  "Narula Institute of Technology",
+  // CC4 – Swamynath Prabhu
+  "Umesh Chandra College",
+  "City College of Commerce (Evening - Umesh Chandra Campus)",
+  "Seth Anandram Jaipuria College",
+  "Bangabasi College",
+  // CC5 – Arup Prabhu
+  "Acharya Girish Chandra Bose College",
+  "Chittaranjan College",
+  "Sirish Chandra College",
+  "Maharaja Manindra Chandra College",
+  "Sir Gurudas Mahavidyalaya",
+  "Shibpur Dinobundhoo Institution (College)",
+  "Rabindra Bharati University",
+  // CC6 – Sadkirti Nityananda Prabhu
+  "A.J.C. Bose College",
+  "Charuchandra College",
   "Bengal Music College",
   "Jogesh Chandra Chaudhuri College",
   "Vijaygarh Jyotish Ray College",
@@ -42,38 +58,22 @@ const DEFAULT_COLLEGES_LIST = [
   "Sammilani Mahavidyalaya",
   "K.K. Das College",
   "Dinabandhu Andrews College",
-  "Baruipur College",
+  "Dr. Kanai Lal Bhattacharya College",
+  "NRS Medical College (Nilratan Sircar)",
+  "Presidency University",
+  // CC7 – Sandipan Prabhu
   "Behala College",
   "Rabin Mukherjee College",
   "Kishore Bharati Bhagini Nivedita College",
   "Vivekananda College (Thakurpukur)",
-  "Shishuram Das College",
+  "Shishuram Das College (Sarisha)",
   "Sarsuna College",
   "New Alipore College",
-  "Shibpur Dinobundhoo Institution (College)",
-  "Dr. Kanailal Bhattacharyya College",
-  "THK Jain College",
-  "Heritage Law College",
-
-  // 5 Medical Colleges
-  "Calcutta Medical College",
-  "IPGMER (Institute of Post Graduate Medical Education and Research / SSKM Hospital)",
-  "Nilratan Sircar (NRS) Medical College and Hospital",
-  "R.G. Kar Medical College and Hospital",
-  "Calcutta National Medical College and Hospital (CNMC)",
-
-  // Engineering, Universities & Other Options
-  "St. Thomas College of Engineering and Technology",
-  "B.P. Podder Institute of Management and Technology",
-  "Indian Statistical Institute (ISI)",
+  // CC8 – Adarsh Prabhu
   "Indian Institute of Engineering Science and Technology (IIEST), Shibpur",
-  "Rabindra Bharati University",
-  "Jadavpur University",
+  // CC9 – Jay Prakash Prabhu
   "Brainware University",
-  "Adamas University",
-  "Presidency University",
-  "Other college under Calcutta University",
-  "Other Colleges / Universities"
+  "Barasat Government College",
 ];
 
 export default function Register() {

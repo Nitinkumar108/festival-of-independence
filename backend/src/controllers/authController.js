@@ -116,18 +116,18 @@ async function registerStudent(req, res, next) {
     let finalCollegeId = collegeId;
     if (customCollegeName && customCollegeName.trim().length > 0) {
       const trimmedName = customCollegeName.trim();
-      const [customCollege] = await College.findOrCreate({
+      const [customCollege, wasCreated] = await College.findOrCreate({
         where: { name: trimmedName },
-        defaults: { name: trimmedName },
+        defaults: { name: trimmedName, isPending: true }, // NEW: mark as pending until admin assigns cluster
       });
       finalCollegeId = customCollege.id;
     } else if (collegeId) {
       // If collegeId is a college name string rather than a UUID, find or create it
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(collegeId);
       if (!isUuid) {
-        const [cByName] = await College.findOrCreate({
+        const [cByName, wasCreated] = await College.findOrCreate({
           where: { name: collegeId },
-          defaults: { name: collegeId },
+          defaults: { name: collegeId, isPending: false },
         });
         finalCollegeId = cByName.id;
       }
@@ -143,6 +143,86 @@ async function registerStudent(req, res, next) {
       email: normalizedEmail,
       username: username.trim(),
       passwordHash,
+    });
+
+    // Send Welcome & Congratulation Email asynchronously (non-blocking)
+    const collegeRecord = finalCollegeId ? await College.findByPk(finalCollegeId, { include: ["Cluster"] }).catch(() => null) : null;
+    const collegeName = collegeRecord?.name || "Your College";
+    const clusterCode = collegeRecord?.Cluster?.code || "";
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+
+    sendEmail({
+      to: student.email,
+      subject: "🎉 Registration Confirmed — Welcome to Festival of Independence 2026!",
+      text: `Dear ${student.fullName},\n\nCongratulations! Your registration for Festival of Independence (IYF Kolkata) has been successfully confirmed.\n\nRegistration ID: ${student.id}\nUsername: ${student.username}\nCollege: ${collegeName}${clusterCode ? ` (${clusterCode})` : ""}\n\nYou can access your student dashboard here:\n${clientUrl}/login\n\nWarm regards,\nIYF Kolkata Team`,
+      html: `
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; background-color: #ffffff; border: 1px solid #f0f0f0; border-radius: 16px; color: #1e293b;">
+          
+          <!-- Header Banner -->
+          <div style="background: linear-gradient(135deg, #FF9933 0%, #FF6600 100%); padding: 28px; border-radius: 12px; text-align: center; color: #ffffff;">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; background: rgba(255,255,255,0.25); padding: 4px 12px; border-radius: 20px;">
+              IYF Kolkata Presents
+            </span>
+            <h1 style="margin: 12px 0 6px; font-size: 24px; font-weight: 900; letter-spacing: -0.5px;">
+              Festival of Independence
+            </h1>
+            <p style="margin: 0; font-size: 14px; opacity: 0.95;">Youth Enlightenment & Cultural Fest</p>
+          </div>
+
+          <!-- Body Content -->
+          <div style="padding: 24px 8px 8px;">
+            <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
+              🎉 Congratulations, ${student.fullName}!
+            </h2>
+            <p style="font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
+              Your registration for the <strong>Festival of Independence</strong> is officially confirmed. We are thrilled to welcome you to this transformative experience.
+            </p>
+
+            <!-- Registration Info Box -->
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+              <h3 style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-top: 0; margin-bottom: 12px;">
+                Registration Details
+              </h3>
+              <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b; font-weight: 600; width: 35%;">Registration ID:</td>
+                  <td style="padding: 4px 0; font-family: monospace; font-weight: 700; color: #0f172a;">${student.id}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b; font-weight: 600;">Username:</td>
+                  <td style="padding: 4px 0; font-weight: 700; color: #0f172a;">${student.username}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b; font-weight: 600;">College:</td>
+                  <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${collegeName}${clusterCode ? ` (${clusterCode})` : ""}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b; font-weight: 600;">Phone:</td>
+                  <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${student.phoneNumber}</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Call to Action Button -->
+            <div style="text-align: center; margin-bottom: 24px;">
+              <a href="${clientUrl}/login" style="display: inline-block; background: linear-gradient(135deg, #FF9933 0%, #F57C00 100%); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 14px; padding: 12px 28px; border-radius: 10px; box-shadow: 0 4px 12px rgba(255, 153, 51, 0.3);">
+                Sign In to Student Dashboard →
+              </a>
+            </div>
+
+            <p style="font-size: 12px; line-height: 1.5; color: #94a3b8; text-align: center; margin: 0;">
+              If you have any questions or need assistance, feel free to reply to this email or contact the IYF Kolkata team.
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 20px; text-align: center; font-size: 11px; color: #94a3b8;">
+            © Festival of Independence · ISKCON Youth Forum (IYF) Kolkata
+          </div>
+        </div>
+      `,
+    }).catch((err) => {
+      console.warn("Failed to dispatch welcome email:", err.message);
     });
 
     const token = generateToken({ id: student.id, role: "student" });

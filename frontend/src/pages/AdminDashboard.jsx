@@ -31,6 +31,10 @@ import {
   ChevronUp,
   SlidersHorizontal,
   RotateCcw,
+  Link2,
+  RotateCw,
+  AlertCircle,
+  Layers,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -94,10 +98,21 @@ export default function AdminDashboard() {
   const [savingEditAdmin, setSavingEditAdmin] = useState(false);
   const [editAdminFeedback, setEditAdminFeedback] = useState("");
 
+  // Clusters state
+  const [clusters, setClusters] = useState([]);
+  const [loadingClusters, setLoadingClusters] = useState(false);
+  const [expandedCluster, setExpandedCluster] = useState(null);
+  const [pendingColleges, setPendingColleges] = useState([]);
+  const [pendingAssignMap, setPendingAssignMap] = useState({}); // { collegeId: clusterId }
+  const [assigningCollege, setAssigningCollege] = useState(null);
+  const [rotatingToken, setRotatingToken] = useState(null);
+  const [globalToken, setGlobalToken] = useState("");
+  const [rotatingGlobalToken, setRotatingGlobalToken] = useState(false);
+
   // Admin Profile Form State
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "IYF Kolkata Admin",
-    email: user?.email || "nitin.231218@gmail.com",
+    email: user?.email || "admin@iyfkolkata.org",
     role: user?.role || user?.adminRole || "SuperAdmin",
   });
 
@@ -126,6 +141,7 @@ export default function AdminDashboard() {
     if (activeTab === "colleges") fetchColleges();
     if (activeTab === "team") fetchAdminTeam();
     if (activeTab === "messages") fetchContactMessages();
+    if (activeTab === "clusters") { fetchClusters(); fetchPendingColleges(); }
   }, [activeTab, paymentStatus, selectedCollege, selectedDate, selectedGender]);
 
 
@@ -198,6 +214,118 @@ export default function AdminDashboard() {
       setColleges(res.data);
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  async function fetchClusters() {
+    setLoadingClusters(true);
+    try {
+      const [clusterRes, globalTokenRes] = await Promise.all([
+        api.get("/clusters"),
+        api.get("/clusters/global-token").catch(() => ({ data: { accessToken: "" } })),
+      ]);
+      setClusters(clusterRes.data);
+      if (globalTokenRes.data?.accessToken) {
+        setGlobalToken(globalTokenRes.data.accessToken);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingClusters(false);
+    }
+  }
+
+  async function handleCopyGlobalLink() {
+    if (!globalToken) {
+      toast.error("Global token not loaded. Please refresh.");
+      return;
+    }
+    const url = `${window.location.origin}/all-registrations?token=${globalToken}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("All-Registrations Global Shareable Link copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy. URL: " + url);
+    }
+  }
+
+  async function handleRotateGlobalToken() {
+    if (!confirm("Rotate the All-Registrations Global link? The previous link will stop working.")) return;
+    setRotatingGlobalToken(true);
+    try {
+      const res = await api.post("/clusters/global-token/rotate");
+      setGlobalToken(res.data.accessToken);
+      toast.success("Global link rotated successfully!");
+    } catch {
+      toast.error("Failed to rotate global link.");
+    } finally {
+      setRotatingGlobalToken(false);
+    }
+  }
+
+  async function fetchPendingColleges() {
+    try {
+      const res = await api.get("/clusters/pending-colleges");
+      setPendingColleges(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleAssignCollege(collegeId) {
+    const clusterId = pendingAssignMap[collegeId];
+    if (!clusterId) { toast.error("Please select a cluster first."); return; }
+    setAssigningCollege(collegeId);
+    try {
+      await api.put(`/clusters/colleges/${collegeId}/assign`, { clusterId });
+      toast.success("College assigned to cluster successfully!");
+      await fetchClusters();
+      await fetchPendingColleges();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to assign college.");
+    } finally {
+      setAssigningCollege(null);
+    }
+  }
+
+  async function handleRotateToken(clusterId, clusterCode) {
+    if (!confirm(`Rotate the shareable link for ${clusterCode}? The old link will stop working immediately.`)) return;
+    setRotatingToken(clusterId);
+    try {
+      await api.post(`/clusters/${clusterId}/rotate-token`);
+      toast.success(`New shareable link generated for ${clusterCode}.`);
+      await fetchClusters();
+    } catch (err) {
+      toast.error("Failed to rotate token.");
+    } finally {
+      setRotatingToken(null);
+    }
+  }
+
+  async function handleCopyClusterLink(accessToken, clusterCode) {
+    const url = `${window.location.origin}/cluster?token=${accessToken}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(`Shareable link for ${clusterCode} copied to clipboard!`);
+    } catch {
+      toast.error("Failed to copy link. Please copy manually: " + url);
+    }
+  }
+
+  async function handleDownloadClusterExcel(clusterId, clusterCode) {
+    try {
+      toast.info(`Generating ${clusterCode} Excel…`);
+      const res = await api.get(`/clusters/${clusterId}/export`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${clusterCode}-registrations.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success(`${clusterCode} Excel downloaded!`);
+    } catch {
+      toast.error("Failed to download Excel.");
     }
   }
 
@@ -555,6 +683,24 @@ export default function AdminDashboard() {
                   }`}
                 >
                   <Users className="w-4 h-4 text-saffron" /> Admin Team Management
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("clusters")}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+                    activeTab === "clusters"
+                      ? "bg-amber-100/70 text-saffron shadow-2xs"
+                      : "text-gray-600 hover:bg-gray-100/80"
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <Layers className="w-4 h-4 text-saffron" /> Cluster Management
+                  </span>
+                  {pendingColleges.length > 0 && (
+                    <span className="text-[10px] font-extrabold bg-red-500 text-white px-2 py-0.5 rounded-full">
+                      {pendingColleges.length}
+                    </span>
+                  )}
                 </button>
 
                 <button
@@ -1457,6 +1603,179 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* TAB 8: CLUSTER MANAGEMENT */}
+            {activeTab === "clusters" && (
+              <div className="space-y-6">
+                <div className="border-b border-gray-100 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-xl font-extrabold tracking-tight text-navy">Cluster Management</h2>
+                    <p className="text-xs text-gray-500 mt-0.5">9 clusters · Manage college assignments, shareable links, and Excel exports.</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={handleCopyGlobalLink}
+                      className="flex items-center gap-1.5 bg-gradient-to-r from-slate-800 to-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl hover:from-slate-700 hover:to-slate-800 transition-all shadow-xs"
+                      title="Shareable link that shows registrations across all 9 clusters"
+                    >
+                      <Link2 className="w-3.5 h-3.5 text-amber-400" /> Share All Registrations Link
+                    </button>
+                    {isSuperAdmin && (
+                      <button
+                        onClick={handleRotateGlobalToken}
+                        disabled={rotatingGlobalToken}
+                        className="flex items-center gap-1 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-2.5 rounded-xl transition-all disabled:opacity-50"
+                        title="Rotate All-Registrations link"
+                      >
+                        <RotateCw className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { fetchClusters(); fetchPendingColleges(); }}
+                      className="flex items-center gap-1.5 bg-navy text-white text-xs font-bold px-3.5 py-2.5 rounded-xl hover:bg-saffron hover:text-navy transition-all shadow-xs"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                    </button>
+                  </div>
+                </div>
+
+                {/* Pending Colleges Alert */}
+                {pendingColleges.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                      <h3 className="text-sm font-black text-red-700">
+                        {pendingColleges.length} Pending College{pendingColleges.length > 1 ? "s" : ""} — Needs Cluster Assignment
+                      </h3>
+                    </div>
+                    <p className="text-xs text-red-600">Students from these unlisted colleges registered. Assign each to a cluster so they appear in cluster reports.</p>
+                    <div className="space-y-2">
+                      {pendingColleges.map((pc) => (
+                        <div key={pc.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-white rounded-xl p-3 border border-red-100">
+                          <span className="text-xs font-bold text-gray-800 flex-1">{pc.name}</span>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <select
+                              value={pendingAssignMap[pc.id] || ""}
+                              onChange={(e) => setPendingAssignMap((prev) => ({ ...prev, [pc.id]: e.target.value }))}
+                              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 font-semibold focus:outline-none focus:border-saffron"
+                            >
+                              <option value="">Select cluster…</option>
+                              {clusters.map((c) => (
+                                <option key={c.id} value={c.id}>{c.code} – {c.facilitatorName}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => handleAssignCollege(pc.id)}
+                              disabled={assigningCollege === pc.id || !pendingAssignMap[pc.id]}
+                              className="text-xs font-bold bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-all"
+                            >
+                              {assigningCollege === pc.id ? "Assigning…" : "Assign"}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cluster Cards Grid */}
+                {loadingClusters ? (
+                  <div className="flex items-center justify-center py-16">
+                    <div className="w-8 h-8 border-4 border-saffron border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {clusters.map((c) => (
+                      <div
+                        key={c.id}
+                        className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
+                      >
+                        {/* Card Header */}
+                        <div
+                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/60 transition-colors"
+                          onClick={() => setExpandedCluster(expandedCluster === c.id ? null : c.id)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-white flex items-center justify-center font-black text-sm shadow-sm">
+                              {c.code}
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-gray-800">{c.facilitatorName}</p>
+                              <p className="text-xs text-gray-400 font-medium">
+                                {c.collegeCount} college{c.collegeCount !== 1 ? "s" : ""} · {c.registrationCount} registered
+                              </p>
+                            </div>
+                          </div>
+                          {c.pendingCollegeCount > 0 && (
+                            <span className="text-[10px] font-extrabold bg-red-100 text-red-600 px-2 py-0.5 rounded-full border border-red-200">
+                              {c.pendingCollegeCount} pending
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Expanded Panel */}
+                        {expandedCluster === c.id && (
+                          <div className="border-t border-gray-100 p-4 space-y-4 bg-gray-50/50">
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={() => handleCopyClusterLink(c.accessToken, c.code)}
+                                className="flex items-center gap-1.5 text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all"
+                              >
+                                <Link2 className="w-3.5 h-3.5" /> Copy Shareable Link
+                              </button>
+                              <button
+                                onClick={() => handleDownloadClusterExcel(c.id, c.code)}
+                                className="flex items-center gap-1.5 text-xs font-bold bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-all"
+                              >
+                                <Download className="w-3.5 h-3.5" /> Download Excel
+                              </button>
+                              {isSuperAdmin && (
+                                <button
+                                  onClick={() => handleRotateToken(c.id, c.code)}
+                                  disabled={rotatingToken === c.id}
+                                  className="flex items-center gap-1.5 text-xs font-bold bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50"
+                                >
+                                  <RotateCw className="w-3.5 h-3.5" />
+                                  {rotatingToken === c.id ? "Rotating…" : "Rotate Link"}
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Colleges list */}
+                            <div>
+                              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Assigned Colleges</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {c.colleges.filter(col => !col.isPending).map((col) => (
+                                  <span key={col.id} className="text-[11px] font-semibold bg-orange-50 text-orange-700 border border-orange-200 px-2.5 py-0.5 rounded-full">
+                                    {col.name}
+                                  </span>
+                                ))}
+                                {c.colleges.filter(col => !col.isPending).length === 0 && (
+                                  <span className="text-xs text-gray-400">No colleges assigned yet.</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Stats */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
+                                <p className="text-2xl font-black text-gray-800">{c.registrationCount}</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase">Registrations</p>
+                              </div>
+                              <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
+                                <p className="text-2xl font-black text-gray-800">{c.collegeCount}</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase">Colleges</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

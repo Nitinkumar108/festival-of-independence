@@ -10,6 +10,15 @@ const College = sequelize.define(
       primaryKey: true,
     },
     name: { type: DataTypes.STRING, allowNull: false, unique: true },
+    clusterId: {
+      type: DataTypes.UUID,
+      allowNull: true, // null = pending/unassigned
+      references: { model: "clusters", key: "id" },
+    },
+    isPending: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // true when a student self-registers a new unlisted college
+    },
   },
   {
     tableName: "colleges",

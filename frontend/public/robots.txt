@@ -1,0 +1,12 @@
+# Allow Googlebot and all search engine crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: *
+Allow: /
+
+# Disallow API or admin paths if applicable
+Disallow: /api/
+
+# Specify Sitemap location (Replace with your actual domain when live)
+# Sitemap: https://festivalofindependence.com/sitemap.xml
