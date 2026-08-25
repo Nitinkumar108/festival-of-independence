@@ -103,8 +103,11 @@ export default function AdminDashboard() {
   const [loadingClusters, setLoadingClusters] = useState(false);
   const [expandedCluster, setExpandedCluster] = useState(null);
   const [pendingColleges, setPendingColleges] = useState([]);
+  const [unassignedColleges, setUnassignedColleges] = useState([]);
   const [pendingAssignMap, setPendingAssignMap] = useState({}); // { collegeId: clusterId }
   const [assigningCollege, setAssigningCollege] = useState(null);
+  const [reassignMap, setReassignMap] = useState({}); // { collegeId: clusterId } for reassignment
+  const [reassigningCollege, setReassigningCollege] = useState(null);
   const [rotatingToken, setRotatingToken] = useState(null);
   const [globalToken, setGlobalToken] = useState("");
   const [rotatingGlobalToken, setRotatingGlobalToken] = useState(false);
@@ -141,7 +144,7 @@ export default function AdminDashboard() {
     if (activeTab === "colleges") fetchColleges();
     if (activeTab === "team") fetchAdminTeam();
     if (activeTab === "messages") fetchContactMessages();
-    if (activeTab === "clusters") { fetchClusters(); fetchPendingColleges(); }
+    if (activeTab === "clusters") { fetchClusters(); fetchPendingColleges(); fetchUnassignedColleges(); }
   }, [activeTab, paymentStatus, selectedCollege, selectedDate, selectedGender]);
 
 
@@ -235,6 +238,15 @@ export default function AdminDashboard() {
     }
   }
 
+  async function fetchUnassignedColleges() {
+    try {
+      const res = await api.get("/clusters/unassigned-colleges");
+      setUnassignedColleges(res.data.colleges ?? []);
+    } catch {
+      // ignore
+    }
+  }
+
   async function handleCopyGlobalLink() {
     if (!globalToken) {
       toast.error("Global token not loaded. Please refresh.");
@@ -281,10 +293,29 @@ export default function AdminDashboard() {
       toast.success("College assigned to cluster successfully!");
       await fetchClusters();
       await fetchPendingColleges();
+      await fetchUnassignedColleges();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to assign college.");
     } finally {
       setAssigningCollege(null);
+    }
+  }
+
+  async function handleReassignCollege(collegeId, collegeName) {
+    const newClusterId = reassignMap[collegeId];
+    if (!newClusterId) { toast.error("Please select a target cluster first."); return; }
+    setReassigningCollege(collegeId);
+    try {
+      await api.put(`/clusters/colleges/${collegeId}/assign`, { clusterId: newClusterId });
+      const targetCluster = clusters.find((c) => c.id === newClusterId);
+      toast.success(`"${collegeName}" moved to ${targetCluster?.code || "new cluster"}.`);
+      setReassignMap((prev) => { const n = { ...prev }; delete n[collegeId]; return n; });
+      await fetchClusters();
+      await fetchUnassignedColleges();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to reassign college.");
+    } finally {
+      setReassigningCollege(null);
     }
   }
 
@@ -1609,7 +1640,8 @@ export default function AdminDashboard() {
             {/* TAB 8: CLUSTER MANAGEMENT */}
             {activeTab === "clusters" && (
               <div className="space-y-6">
-                <div className="border-b border-gray-100 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                {/* Header */}
+                <div className="border-b border-gray-100 pb-4 flex flex-col gap-3">
                   <div>
                     <h2 className="text-xl font-extrabold tracking-tight text-navy">Cluster Management</h2>
                     <p className="text-xs text-gray-500 mt-0.5">9 clusters · Manage college assignments, shareable links, and Excel exports.</p>
@@ -1617,7 +1649,7 @@ export default function AdminDashboard() {
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={handleCopyGlobalLink}
-                      className="flex items-center gap-1.5 bg-gradient-to-r from-slate-800 to-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl hover:from-slate-700 hover:to-slate-800 transition-all shadow-xs"
+                      className="flex items-center gap-1.5 bg-gradient-to-r from-slate-800 to-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl hover:from-slate-700 hover:to-slate-800 transition-all shadow-xs flex-1 sm:flex-none justify-center sm:justify-start"
                       title="Shareable link that shows registrations across all 9 clusters"
                     >
                       <Link2 className="w-3.5 h-3.5 text-amber-400" /> Share All Registrations Link
@@ -1633,7 +1665,7 @@ export default function AdminDashboard() {
                       </button>
                     )}
                     <button
-                      onClick={() => { fetchClusters(); fetchPendingColleges(); }}
+                      onClick={() => { fetchClusters(); fetchPendingColleges(); fetchUnassignedColleges(); }}
                       className="flex items-center gap-1.5 bg-navy text-white text-xs font-bold px-3.5 py-2.5 rounded-xl hover:bg-saffron hover:text-navy transition-all shadow-xs"
                     >
                       <RefreshCw className="w-3.5 h-3.5" /> Refresh
@@ -1641,11 +1673,50 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                {/* Unassigned Colleges — Manual Assignment */}
+                {unassignedColleges.length > 0 && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <h3 className="text-sm font-black text-amber-800">
+                        {unassignedColleges.length} College{unassignedColleges.length > 1 ? "s" : ""} — Not Yet Assigned to a Cluster
+                      </h3>
+                    </div>
+                    <p className="text-xs text-amber-700">These colleges have no cluster. Students from them won't appear in cluster reports. Manually assign each to a cluster below.</p>
+                    <div className="space-y-2">
+                      {unassignedColleges.map((uc) => (
+                        <div key={uc.id} className="flex flex-col gap-2 bg-white rounded-xl p-3 border border-amber-100">
+                          <span className="text-xs font-bold text-gray-800">{uc.name}</span>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={pendingAssignMap[uc.id] || ""}
+                              onChange={(e) => setPendingAssignMap((prev) => ({ ...prev, [uc.id]: e.target.value }))}
+                              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 font-semibold focus:outline-none focus:border-saffron flex-1 min-w-0"
+                            >
+                              <option value="">Select cluster…</option>
+                              {clusters.filter(c => c.code !== "GLOBAL").map((c) => (
+                                <option key={c.id} value={c.id}>{c.code} – {c.facilitatorName}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => handleAssignCollege(uc.id)}
+                              disabled={assigningCollege === uc.id || !pendingAssignMap[uc.id]}
+                              className="text-xs font-bold bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-all flex-shrink-0"
+                            >
+                              {assigningCollege === uc.id ? "…" : "Assign"}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Pending Colleges Alert */}
                 {pendingColleges.length > 0 && (
                   <div className="bg-red-50 border border-red-200 rounded-2xl p-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 text-red-500" />
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                       <h3 className="text-sm font-black text-red-700">
                         {pendingColleges.length} Pending College{pendingColleges.length > 1 ? "s" : ""} — Needs Cluster Assignment
                       </h3>
@@ -1653,13 +1724,13 @@ export default function AdminDashboard() {
                     <p className="text-xs text-red-600">Students from these unlisted colleges registered. Assign each to a cluster so they appear in cluster reports.</p>
                     <div className="space-y-2">
                       {pendingColleges.map((pc) => (
-                        <div key={pc.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-white rounded-xl p-3 border border-red-100">
-                          <span className="text-xs font-bold text-gray-800 flex-1">{pc.name}</span>
-                          <div className="flex items-center gap-2 flex-shrink-0">
+                        <div key={pc.id} className="flex flex-col gap-2 bg-white rounded-xl p-3 border border-red-100">
+                          <span className="text-xs font-bold text-gray-800">{pc.name}</span>
+                          <div className="flex items-center gap-2">
                             <select
                               value={pendingAssignMap[pc.id] || ""}
                               onChange={(e) => setPendingAssignMap((prev) => ({ ...prev, [pc.id]: e.target.value }))}
-                              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 font-semibold focus:outline-none focus:border-saffron"
+                              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 font-semibold focus:outline-none focus:border-saffron flex-1 min-w-0"
                             >
                               <option value="">Select cluster…</option>
                               {clusters.map((c) => (
@@ -1669,9 +1740,9 @@ export default function AdminDashboard() {
                             <button
                               onClick={() => handleAssignCollege(pc.id)}
                               disabled={assigningCollege === pc.id || !pendingAssignMap[pc.id]}
-                              className="text-xs font-bold bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-all"
+                              className="text-xs font-bold bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-all flex-shrink-0"
                             >
-                              {assigningCollege === pc.id ? "Assigning…" : "Assign"}
+                              {assigningCollege === pc.id ? "…" : "Assign"}
                             </button>
                           </div>
                         </div>
@@ -1694,49 +1765,52 @@ export default function AdminDashboard() {
                       >
                         {/* Card Header */}
                         <div
-                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/60 transition-colors"
+                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/60 transition-colors gap-2"
                           onClick={() => setExpandedCluster(expandedCluster === c.id ? null : c.id)}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-white flex items-center justify-center font-black text-sm shadow-sm">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-white flex items-center justify-center font-black text-xs shadow-sm flex-shrink-0">
                               {c.code}
                             </div>
-                            <div>
-                              <p className="text-sm font-black text-gray-800">{c.facilitatorName}</p>
+                            <div className="min-w-0">
+                              <p className="text-sm font-black text-gray-800 truncate">{c.facilitatorName}</p>
                               <p className="text-xs text-gray-400 font-medium">
                                 {c.collegeCount} college{c.collegeCount !== 1 ? "s" : ""} · {c.registrationCount} registered
                               </p>
                             </div>
                           </div>
-                          {c.pendingCollegeCount > 0 && (
-                            <span className="text-[10px] font-extrabold bg-red-100 text-red-600 px-2 py-0.5 rounded-full border border-red-200">
-                              {c.pendingCollegeCount} pending
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            {c.pendingCollegeCount > 0 && (
+                              <span className="text-[10px] font-extrabold bg-red-100 text-red-600 px-2 py-0.5 rounded-full border border-red-200">
+                                {c.pendingCollegeCount} pending
+                              </span>
+                            )}
+                            <span className="text-gray-300">{expandedCluster === c.id ? "▲" : "▼"}</span>
+                          </div>
                         </div>
 
                         {/* Expanded Panel */}
                         {expandedCluster === c.id && (
                           <div className="border-t border-gray-100 p-4 space-y-4 bg-gray-50/50">
                             {/* Action Buttons */}
-                            <div className="flex flex-wrap gap-2">
+                            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                               <button
                                 onClick={() => handleCopyClusterLink(c.accessToken, c.code)}
-                                className="flex items-center gap-1.5 text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all"
+                                className="flex items-center justify-center gap-1.5 text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all"
                               >
-                                <Link2 className="w-3.5 h-3.5" /> Copy Shareable Link
+                                <Link2 className="w-3.5 h-3.5" /> Copy Link
                               </button>
                               <button
                                 onClick={() => handleDownloadClusterExcel(c.id, c.code)}
-                                className="flex items-center gap-1.5 text-xs font-bold bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-all"
+                                className="flex items-center justify-center gap-1.5 text-xs font-bold bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-all"
                               >
-                                <Download className="w-3.5 h-3.5" /> Download Excel
+                                <Download className="w-3.5 h-3.5" /> Excel
                               </button>
                               {isSuperAdmin && (
                                 <button
                                   onClick={() => handleRotateToken(c.id, c.code)}
                                   disabled={rotatingToken === c.id}
-                                  className="flex items-center gap-1.5 text-xs font-bold bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50"
+                                  className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 text-xs font-bold bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50"
                                 >
                                   <RotateCw className="w-3.5 h-3.5" />
                                   {rotatingToken === c.id ? "Rotating…" : "Rotate Link"}
@@ -1744,19 +1818,39 @@ export default function AdminDashboard() {
                               )}
                             </div>
 
-                            {/* Colleges list */}
+                            {/* Colleges list with Reassign */}
                             <div>
                               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Assigned Colleges</p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {c.colleges.filter(col => !col.isPending).map((col) => (
-                                  <span key={col.id} className="text-[11px] font-semibold bg-orange-50 text-orange-700 border border-orange-200 px-2.5 py-0.5 rounded-full">
-                                    {col.name}
-                                  </span>
-                                ))}
-                                {c.colleges.filter(col => !col.isPending).length === 0 && (
-                                  <span className="text-xs text-gray-400">No colleges assigned yet.</span>
-                                )}
-                              </div>
+                              {c.colleges.filter(col => !col.isPending).length === 0 ? (
+                                <span className="text-xs text-gray-400">No colleges assigned yet.</span>
+                              ) : (
+                                <div className="space-y-1.5">
+                                  {c.colleges.filter(col => !col.isPending).map((col) => (
+                                    <div key={col.id} className="flex flex-col gap-1.5 bg-white rounded-xl px-3 py-2 border border-gray-100">
+                                      <span className="text-xs font-semibold text-gray-800">{col.name}</span>
+                                      <div className="flex items-center gap-1.5">
+                                        <select
+                                          value={reassignMap[col.id] || ""}
+                                          onChange={(e) => setReassignMap((prev) => ({ ...prev, [col.id]: e.target.value }))}
+                                          className="text-[11px] border border-gray-200 rounded-lg px-2 py-1 font-semibold focus:outline-none focus:border-saffron bg-gray-50 flex-1 min-w-0"
+                                        >
+                                          <option value="">Move to…</option>
+                                          {clusters.filter(cl => cl.code !== "GLOBAL" && cl.id !== c.id).map((cl) => (
+                                            <option key={cl.id} value={cl.id}>{cl.code} – {cl.facilitatorName}</option>
+                                          ))}
+                                        </select>
+                                        <button
+                                          onClick={() => handleReassignCollege(col.id, col.name)}
+                                          disabled={reassigningCollege === col.id || !reassignMap[col.id]}
+                                          className="text-[11px] font-bold bg-indigo-600 text-white px-2.5 py-1 rounded-lg hover:bg-indigo-700 disabled:opacity-40 transition-all flex-shrink-0"
+                                        >
+                                          {reassigningCollege === col.id ? "…" : "Move"}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
 
                             {/* Stats */}

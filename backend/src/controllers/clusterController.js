@@ -122,6 +122,20 @@ async function listPendingColleges(req, res, next) {
   }
 }
 
+/** GET /api/clusters/unassigned-colleges — count colleges with no cluster (admin JWT) */
+async function listUnassignedColleges(req, res, next) {
+  try {
+    const colleges = await College.findAll({
+      where: { clusterId: null, isPending: false },
+      attributes: ["id", "name", "createdAt"],
+      order: [["name", "ASC"]],
+    });
+    res.json({ count: colleges.length, colleges });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /** PUT /api/clusters/colleges/:id/assign — assign a college to a cluster (SuperAdmin) */
 async function assignCollegeToCluster(req, res, next) {
   try {
@@ -411,6 +425,60 @@ async function exportGlobalExcel(req, res, next) {
   }
 }
 
+// ─── Admin: Distribute unassigned colleges equally across clusters ──────────
+
+/** POST /api/clusters/distribute-unassigned — round-robin assign unassigned colleges (SuperAdmin) */
+async function distributeUnassignedColleges(req, res, next) {
+  try {
+    // 1. Find all colleges with no cluster and not pending
+    const unassignedColleges = await College.findAll({
+      where: { clusterId: null, isPending: false },
+      order: [["name", "ASC"]],
+    });
+
+    if (unassignedColleges.length === 0) {
+      return res.json({ message: "No unassigned colleges found. Nothing to distribute.", distributed: 0, summary: [] });
+    }
+
+    // 2. Fetch all real clusters (exclude GLOBAL)
+    const clusters = await Cluster.findAll({
+      where: { code: { [Op.ne]: GLOBAL_CLUSTER_CODE } },
+      include: [{ model: College, attributes: ["id"], where: { isPending: false }, required: false }],
+      order: [["code", "ASC"]],
+    });
+
+    if (clusters.length === 0) {
+      return res.status(500).json({ message: "No clusters found. Please seed clusters first." });
+    }
+
+    // 3. Sort clusters ascending by current college count (fill smallest first)
+    const sortedClusters = [...clusters].sort(
+      (a, b) => (a.Colleges?.length || 0) - (b.Colleges?.length || 0)
+    );
+
+    // 4. Round-robin assignment
+    const summary = sortedClusters.map((c) => ({ code: c.code, id: c.id, assigned: [] }));
+    let pointer = 0;
+
+    for (const college of unassignedColleges) {
+      const target = summary[pointer % summary.length];
+      college.clusterId = target.id;
+      college.isPending = false;
+      await college.save();
+      target.assigned.push(college.name);
+      pointer++;
+    }
+
+    return res.json({
+      message: `Successfully distributed ${unassignedColleges.length} college(s) across ${sortedClusters.length} clusters.`,
+      distributed: unassignedColleges.length,
+      summary: summary.map((s) => ({ cluster: s.code, count: s.assigned.length, colleges: s.assigned })),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ─── Admin: Global token management ──────────────────────────────────────────
 
 /** GET /api/clusters/global-token — get current global view token (admin JWT) */
@@ -441,7 +509,9 @@ async function regenerateGlobalToken(req, res, next) {
 module.exports = {
   listClusters,
   listPendingColleges,
+  listUnassignedColleges,
   assignCollegeToCluster,
+  distributeUnassignedColleges,
   exportClusterExcel,
   regenerateClusterToken,
   getClusterByToken,

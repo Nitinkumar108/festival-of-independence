@@ -81,7 +81,7 @@ async function start() {
     await sequelize.authenticate();
     console.log("Database connected successfully.");
     await migrateClusterSchema(); // Ensure clusters table & colleges columns exist in Postgres/SQLite
-    await sequelize.sync({ alter: true });
+    await sequelize.sync(); // Create any missing tables (no ALTER — avoids ECONNRESET on Supabase pooler)
     await seedClustersAndColleges(); // Seed 9 clusters + 54 colleges on every startup
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {

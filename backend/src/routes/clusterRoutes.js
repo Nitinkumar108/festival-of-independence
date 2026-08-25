@@ -4,6 +4,7 @@ const { protect, requireRole, requireSuperAdmin } = require("../middleware/authM
 const {
   listClusters,
   listPendingColleges,
+  listUnassignedColleges,
   assignCollegeToCluster,
   exportClusterExcel,
   regenerateClusterToken,
@@ -33,10 +34,11 @@ router.use(protect, requireRole("admin"));
 
 router.get("/", listClusters);
 router.get("/pending-colleges", listPendingColleges);
+router.get("/unassigned-colleges", listUnassignedColleges);
 router.get("/global-token", getGlobalToken);
 router.post("/global-token/rotate", requireSuperAdmin, regenerateGlobalToken);
 router.get("/:id/export", exportClusterExcel);
-router.put("/colleges/:id/assign", requireSuperAdmin, assignCollegeToCluster);
+router.put("/colleges/:id/assign", assignCollegeToCluster);
 router.post("/:id/rotate-token", requireSuperAdmin, regenerateClusterToken);
 
 module.exports = router;
