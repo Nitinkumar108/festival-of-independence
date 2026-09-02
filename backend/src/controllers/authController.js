@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const { Student, Admin, OtpVerification, College } = require("../models");
+const { Student, Admin, OtpVerification, College, Cluster } = require("../models");
 const generateToken = require("../utils/generateToken");
 const sendEmail = require("../utils/sendEmail");
 const { Op } = require("sequelize");
@@ -112,14 +112,22 @@ async function registerStudent(req, res, next) {
       return res.status(400).json({ message: "This username is already taken. Please choose a different username." });
     }
 
-    // Resolve College: If customCollegeName is provided, find or create the college in DB
+    // Resolve College: If customCollegeName is provided, find or create the college in DB (default to CC10)
+    const cc10Cluster = await Cluster.findOne({ where: { code: "CC10" } }).catch(() => null);
+    const defaultClusterId = cc10Cluster ? cc10Cluster.id : null;
+
     let finalCollegeId = collegeId;
     if (customCollegeName && customCollegeName.trim().length > 0) {
       const trimmedName = customCollegeName.trim();
       const [customCollege, wasCreated] = await College.findOrCreate({
         where: { name: trimmedName },
-        defaults: { name: trimmedName, isPending: true }, // NEW: mark as pending until admin assigns cluster
+        defaults: { name: trimmedName, clusterId: defaultClusterId, isPending: false },
       });
+      if (!customCollege.clusterId && defaultClusterId) {
+        customCollege.clusterId = defaultClusterId;
+        customCollege.isPending = false;
+        await customCollege.save();
+      }
       finalCollegeId = customCollege.id;
     } else if (collegeId) {
       // If collegeId is a college name string rather than a UUID, find or create it
@@ -127,8 +135,13 @@ async function registerStudent(req, res, next) {
       if (!isUuid) {
         const [cByName, wasCreated] = await College.findOrCreate({
           where: { name: collegeId },
-          defaults: { name: collegeId, isPending: false },
+          defaults: { name: collegeId, clusterId: defaultClusterId, isPending: false },
         });
+        if (!cByName.clusterId && defaultClusterId) {
+          cByName.clusterId = defaultClusterId;
+          cByName.isPending = false;
+          await cByName.save();
+        }
         finalCollegeId = cByName.id;
       }
     }

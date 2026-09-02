@@ -27,6 +27,7 @@ const CLUSTER_COLORS = {
   CC7: "bg-teal-100 text-teal-700 border-teal-200",
   CC8: "bg-blue-100 text-blue-700 border-blue-200",
   CC9: "bg-purple-100 text-purple-700 border-purple-200",
+  CC10: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200",
   Unassigned: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
@@ -162,7 +163,7 @@ export default function AllRegistrationsDashboard() {
                 All Registrations
               </h1>
               <p className="text-slate-300 font-semibold mt-1">
-                Global View — All {info?.totalClusters ?? 9} Clusters Combined
+                Global View — All {info?.totalClusters ?? 10} Clusters Combined
               </p>
             </div>
             <div className="flex gap-3">
@@ -222,7 +223,7 @@ export default function AllRegistrationsDashboard() {
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Registrations by Cluster</p>
           <div className="flex flex-wrap gap-2">
-            {["CC1","CC2","CC3","CC4","CC5","CC6","CC7","CC8","CC9"].map((code) => {
+            {["CC1","CC2","CC3","CC4","CC5","CC6","CC7","CC8","CC9","CC10"].map((code) => {
               const count = registrations.filter((r) => r.cluster === code).length;
               return (
                 <button

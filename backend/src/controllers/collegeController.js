@@ -112,6 +112,11 @@ const CLUSTER_COLLEGE_MAP = [
       "Barasat Government College",
     ],
   },
+  {
+    code: "CC10",
+    facilitatorName: "HG Puridas Prabhu",
+    colleges: [],
+  },
 ];
 
 // ─── Legacy / alternate college name aliases ─────────────────────────────────
@@ -169,7 +174,7 @@ const LEGACY_NAME_TO_CLUSTER_CODE = {
 // ─── Seed function: run once on startup ──────────────────────────────────────
 async function seedClustersAndColleges() {
   try {
-    // ── Pass 1: Upsert the 9 clusters and their 54 canonical colleges ─────────
+    // ── Pass 1: Upsert the 10 clusters and their canonical colleges ─────────
     for (const clusterData of CLUSTER_COLLEGE_MAP) {
       // 1a. Upsert cluster record
       const [cluster] = await Cluster.findOrCreate({
@@ -207,7 +212,6 @@ async function seedClustersAndColleges() {
     }
 
     // ── Pass 2: Remap legacy / alternate college names from existing DB rows ──
-    // Handles students who registered before this feature using the old name list.
     let legacyUpdated = 0;
     for (const [legacyName, clusterCode] of Object.entries(LEGACY_NAME_TO_CLUSTER_CODE)) {
       const cluster = await Cluster.findOne({ where: { code: clusterCode } });
@@ -223,7 +227,20 @@ async function seedClustersAndColleges() {
       }
     }
 
-    console.log(`✅ Clusters and colleges seeded/verified successfully. (${legacyUpdated} legacy college names remapped)`);
+    // ── Pass 3: Reassign any remaining unassigned colleges to CC10 (HG Puridas Prabhu) ──
+    const cc10 = await Cluster.findOne({ where: { code: "CC10" } });
+    let unassignedAssignedToCC10 = 0;
+    if (cc10) {
+      const unassignedColleges = await College.findAll({ where: { clusterId: null } });
+      for (const col of unassignedColleges) {
+        col.clusterId = cc10.id;
+        col.isPending = false;
+        await col.save();
+        unassignedAssignedToCC10++;
+      }
+    }
+
+    console.log(`✅ Clusters and colleges seeded/verified successfully. (${legacyUpdated} legacy remapped, ${unassignedAssignedToCC10} unassigned colleges assigned to CC10)`);
   } catch (err) {
     console.error("❌ Failed to seed clusters and colleges:", err.message);
   }

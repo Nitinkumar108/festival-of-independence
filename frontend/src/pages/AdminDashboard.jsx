@@ -1644,13 +1644,13 @@ export default function AdminDashboard() {
                 <div className="border-b border-gray-100 pb-4 flex flex-col gap-3">
                   <div>
                     <h2 className="text-xl font-extrabold tracking-tight text-navy">Cluster Management</h2>
-                    <p className="text-xs text-gray-500 mt-0.5">9 clusters · Manage college assignments, shareable links, and Excel exports.</p>
+                    <p className="text-xs text-gray-500 mt-0.5">10 clusters · Manage college assignments, shareable links, and Excel exports.</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={handleCopyGlobalLink}
                       className="flex items-center gap-1.5 bg-gradient-to-r from-slate-800 to-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl hover:from-slate-700 hover:to-slate-800 transition-all shadow-xs flex-1 sm:flex-none justify-center sm:justify-start"
-                      title="Shareable link that shows registrations across all 9 clusters"
+                      title="Shareable link that shows registrations across all 10 clusters"
                     >
                       <Link2 className="w-3.5 h-3.5 text-amber-400" /> Share All Registrations Link
                     </button>

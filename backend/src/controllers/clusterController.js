@@ -26,7 +26,7 @@ function buildExcelRows(students) {
     fullName: s.fullName,
     gender: s.gender || "—",
     college: s.College?.name || "N/A",
-    cluster: s.College?.Cluster?.code || "Unassigned",
+    cluster: s.College?.Cluster?.code || "CC10",
     phoneNumber: s.phoneNumber,
     email: s.email,
     paymentStatus: s.paymentStatus,
@@ -36,6 +36,31 @@ function buildExcelRows(students) {
 
 // ─── Helper: fetch students for a cluster ────────────────────────────────────
 async function fetchStudentsForCluster(clusterId) {
+  const cluster = await Cluster.findByPk(clusterId);
+  const isCC10 = cluster && cluster.code === "CC10";
+
+  if (isCC10) {
+    return Student.findAll({
+      attributes: ["id", "fullName", "gender", "email", "phoneNumber", "paymentStatus", "createdAt"],
+      include: [
+        {
+          model: College,
+          attributes: ["id", "name", "clusterId"],
+          required: false,
+          include: [{ model: Cluster, as: "Cluster", attributes: ["code", "facilitatorName"] }],
+        },
+      ],
+      where: {
+        [Op.or]: [
+          { "$College.clusterId$": clusterId },
+          { "$College.clusterId$": null },
+          { collegeId: null },
+        ],
+      },
+      order: [["createdAt", "DESC"]],
+    });
+  }
+
   return Student.findAll({
     attributes: ["id", "fullName", "gender", "email", "phoneNumber", "paymentStatus", "createdAt"],
     include: [
@@ -52,17 +77,24 @@ async function fetchStudentsForCluster(clusterId) {
 
 // ─── Admin Routes (JWT required) ──────────────────────────────────────────────
 
-/** GET /api/clusters — list all 9 clusters with stats (admin JWT) */
+/** GET /api/clusters — list all clusters with stats (admin JWT) */
 async function listClusters(req, res, next) {
   try {
-    const clusters = await Cluster.findAll({
+    const rawClusters = await Cluster.findAll({
       include: [
         {
           model: College,
           attributes: ["id", "name", "isPending"],
         },
       ],
-      order: [["code", "ASC"]],
+    });
+
+    // Natural sort: CC1, CC2 ... CC9, CC10, GLOBAL
+    const clusters = rawClusters.sort((a, b) => {
+      const numA = parseInt(a.code.replace(/\D/g, ""), 10);
+      const numB = parseInt(b.code.replace(/\D/g, ""), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.code.localeCompare(b.code);
     });
 
     // Attach registration counts
@@ -73,7 +105,23 @@ async function listClusters(req, res, next) {
           .map((col) => col.id);
 
         let registrationCount = 0;
-        if (clusterCollegeIds.length > 0) {
+        if (c.code === "CC10") {
+          registrationCount = await Student.count({
+            include: [
+              {
+                model: College,
+                required: false,
+              },
+            ],
+            where: {
+              [Op.or]: [
+                { "$College.clusterId$": c.id },
+                { "$College.clusterId$": null },
+                { collegeId: null },
+              ],
+            },
+          });
+        } else if (clusterCollegeIds.length > 0) {
           registrationCount = await Student.count({
             include: [
               {
@@ -232,7 +280,23 @@ async function getClusterByToken(req, res, next) {
     // Count registrations for this cluster
     const collegeIds = (cluster.Colleges || []).map((c) => c.id);
     let registrationCount = 0;
-    if (collegeIds.length > 0) {
+    if (cluster.code === "CC10") {
+      registrationCount = await Student.count({
+        include: [
+          {
+            model: College,
+            required: false,
+          },
+        ],
+        where: {
+          [Op.or]: [
+            { "$College.clusterId$": cluster.id },
+            { "$College.clusterId$": null },
+            { collegeId: null },
+          ],
+        },
+      });
+    } else if (collegeIds.length > 0) {
       registrationCount = await Student.count({
         include: [
           {
@@ -366,7 +430,7 @@ async function getGlobalRegistrations(req, res, next) {
       fullName: s.fullName,
       gender: s.gender || "—",
       college: s.College?.name || "N/A",
-      cluster: s.College?.Cluster?.code || "Unassigned",
+      cluster: s.College?.Cluster?.code || "CC10",
       phoneNumber: s.phoneNumber,
       email: s.email,
       paymentStatus: s.paymentStatus,
